@@ -64,6 +64,6 @@ Picat> learn($[direction(left),direction(left),direction(right)])
 Picat> show_sw
 Switch coin: unfixed_p: head (p: 0.666666667) tail (p: 0.333333333)
 
-The porting of PRISM to Picat was done by Neng-Fa Zhou while he was
-a research fellow at Goldman Sachs in the summer of 2019. Thanks to
-Vijay Saraswat for the opportunity.
+This porting of PRISM to Picat was done by Neng-Fa Zhou while he was
+a research fellow working with Vijay Saraswat at Goldman Sachs in
+the summer of 2020.
