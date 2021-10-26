@@ -1,0 +1,36 @@
+/*
+    See the ProbLog encoding here: https://dtai.cs.kuleuven.be/problog/tutorial/tutslides/01_basic.html
+    As noted in Hakan Kjellerstrand's translation (http://hakank.org/picat/problog_smoke_hakank.pi),
+    for unused switches, such as stress(carl) and influences(ann,ann), the probability distribution should be [0,1].
+*/    
+
+import prism.
+
+values(_,[yes,no]).
+
+main =>
+    set_sw($stress(ann),[0.8,0.2]),
+%    set_sw($stress(bob),[0.4,0.6]),
+    set_sw($stress(bob),[0,1]),
+    set_sw($stress(carl),[0,1]),
+    set_sw($influences(ann,bob),[0.6,0.2]),
+    set_sw($influences(bob,carl),[0.2,0.8]),
+    Ps = [ann,bob,carl],
+    foreach (P1 in Ps, P2 in Ps, (P1,P2) != (ann,bob), (P1,P2) != (bob,carl))
+        set_sw($influences(P1,P2),[0,1])
+    end,
+    %
+    prob($smokes(carl,[carl])).
+
+smokes(X,_) :-
+    msw($stress(X),yes).
+smokes(X,Visited) :-
+    msw($stress(X),no),
+    person(Y),
+    not member(Y,Visited),
+    msw($influences(Y,X),yes),
+    smokes(Y,[X|Visited]).
+
+person(ann).
+person(bob).
+person(carl).
