@@ -1,0 +1,122 @@
+import prism.
+%%%%
+%%%%  ABO blood type --- bloodABO.psm
+%%%%
+%%%%  Copyright (C) 2004,2006,2008
+%%%%    Sato Laboratory, Dept. of Computer Science,
+%%%%    Tokyo Institute of Technology
+
+%%  ABO blood type consists of A, B, O and AB. They are observable
+%%  (phenotypes) and determined by a pair of blood type genes (geneotypes).
+%%  There are three ABO genes, namely a, b and o located on the 9th
+%%  chromosome of a human being. There are 6 geneotypes ({a,a},{a,b},{a,o},
+%%  {b,b},{b,o},{o,o}) and each determines a blood type. For example {a,b}
+%%  gives blood type AB etc. Our task is to estimate frequencies of ABO
+%%  genes from a random sample of ABO blood type, assuming random mate.
+
+%%-------------------------------------
+%%  Quick start : sample session
+%%
+%%  picat> cl(bloodABO),go,print_blood.
+%%                           % Learn parameters from randomly generated
+%%                           % 100 samples with A:B:O:AB = 38:22:31:9
+%%
+%%  picat> sample($bloodtype(X)).
+%%                           % Pick up a person with blood type X randomly
+%%                           % acccording to the currrent parameter settings
+%%
+%%  picat> get_samples(100,$bloodtype(X),_Gs),countlist(_Gs,Cs).
+%%                           % Pick up 100 persons and get the frequencies
+%%                           % of their blood types
+%%
+%%  picat> probf($bloodtype(ab),E),print_graph(E).
+%%                           % Print all explanations for blooodtype(ab) in
+%%                           % a compressed form
+%%
+%%  picat> prob($bloodtype(ab),P).
+%%                           % P is the probability of bloodtype(ab) being true
+%%
+%%  picat> viterbif($bloodtype(ab)).
+%%  picat> viterbif($bloodtype(ab),P,E),print_graph(E).
+%%  picat> viterbi($bloodtype(ab),P).
+%%                           % P is the probability of a most likely
+%%                           % explanation E for bloodtype(ab).
+%%
+%%  picat> viterbit($bloodtype(ab)).
+%%                           % Print the most likely explanation for
+%%                           % bloodtype(ab) in a tree form.
+
+
+main ?=> go,print_blood,fail.
+main ?=> sample($bloodtype(_X)),fail.
+main ?=> get_samples(100,$bloodtype(_X),_Gs),bp.countlist(_Gs,Cs), writeln(Cs),fail.
+main ?=> probf($bloodtype(ab),E),print_graph(E),fail.
+main ?=> prob($bloodtype(ab),P), writeln(P),fail.
+main ?=> viterbif($bloodtype(ab)),fail.
+main ?=> viterbif($bloodtype(ab),_P,E),print_graph(E),fail.
+main ?=> viterbi($bloodtype(ab),P),writeln(P),fail.
+main => viterbit($bloodtype(ab)).
+
+go => learn_bloodtype(100).
+
+%%-------------------------------------
+%%  Declarations:
+
+% :- set_prism_flag(data_source,file('bloodtype.dat')).
+                             % When we run learn/0, the data are supplied
+                             % by `bloodtype.dat'.
+
+values(gene,Os,Ds) => Os=[a,b,o], Ds=[0.5,0.2,0.3].
+                             % We declare msw(gene,V) s.t. V takes on
+                             % one of the genes {a,b,o} when executed,
+                             % with the freq.: a 50%, b 20%, o 30%.
+
+%%------------------------------------
+%%  Modeling part:
+
+bloodtype(P) =>
+   genotype(X,Y),
+   ( X=Y -> P=X
+   ; X=o -> P=Y
+   ; Y=o -> P=X
+   ; P=ab
+   ).
+
+genotype(X,Y) => msw(gene,X),msw(gene,Y).
+                             % We assume random mate. Note that msw(gene,X)
+                             % and msw(gene,Y) are i.i.d. (independent and
+                             % identically distributed) random variables
+                             % in Prism because they have the same id but
+                             % different subgoals.
+
+%%------------------------------------
+%%  Utility part:
+
+learn_bloodtype(N) =>        % Learn parameters from N observations
+   random_set_seed(214857),  %   Set seed of the random number generator
+   gen_bloodtype(N,Gs),    %   Sample bloodtype/1 of size N
+   learn(Gs).                %   Perform search and graphical EM learning
+%  learn.                    % <= when using the file `bloodtype.dat'
+
+gen_bloodtype(N,Gs),N>0 =>
+   random_select([a,b,o,ab],[0.38,0.22,0.31,0.09],X),
+   Gs = [$bloodtype(X)|Gs1],  % Sample a blood type with an empirical
+   N1 is N-1,              % ratio for Japanese people.
+   gen_bloodtype(N1,Gs1).
+gen_bloodtype(_,Gs) => Gs=[].
+
+print_blood =>
+   prob($bloodtype(a),PA),prob($bloodtype(b),PB),
+   prob($bloodtype(o),PO),prob($bloodtype(ab),PAB),
+   nl,
+   printf("P(A)  = %6f%n",PA),
+   printf("P(B)  = %6f%n",PB),
+   printf("P(O)  = %6f%n",PO),
+   printf("P(AB) = %6f%n",PAB).
+
+print_gene =>
+   get_sw(gene,[_,[a,b,o],[GA,GB,GO]]),
+   nl,
+   printf("P(a) = %6f%n",GA),
+   printf("P(b) = %6f%n",GB),
+   printf("P(o) = %6f%n",GO).

@@ -1,0 +1,46 @@
+import prism.
+
+values(die1,[1,2,3,4,5,6]).
+values(die2,[1,2,3,4,5,6]).
+
+main =>
+    set_sw(die1,[1/6,1/6,1/6,1/6,1/6,1/6]),
+	set_sw(die2,[0.15,0.15,0.15,0.15,0.15,0.25]),
+	%
+	prob(twoSix,P1),
+	printf("prob(twoSix) = %f\n",P1),
+	prob(someSix,P2),
+	printf("prob(someSix) = %f\n",P2),
+	prob(odd_1,P_odd1),
+	printf("prob(odd_1) = %f\n",P_odd1),	
+	prob(odd_2,P_odd2),
+	printf("prob(odd_2) = %f\n",P_odd2),	
+	prob(even_1,P_even1),
+	printf("prob(even_1) = %f\n",P_even1),	
+	prob(even_2,P_even2),
+	printf("prob(even_2) = %f\n",P_even2).
+
+twoSix :-
+    msw(die1,6),
+	msw(die2,6).
+
+someSix :-
+    msw(die1,O1),
+	msw(die2,O2),
+	(O1 == 6 ; O2 == 6).
+
+odd_1 :-
+    msw(die1,X),
+	X mod 2 =:= 1.
+
+odd_2 :-
+    msw(die2,X),
+	X mod 2 =:= 1.
+
+even_1 :-
+    msw(die1,X),
+	X mod 2 =:= 0.
+
+even_2 :-
+    msw(die2,X),
+	X mod 2 =:= 0.

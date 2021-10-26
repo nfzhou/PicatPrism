@@ -1,0 +1,172 @@
+allocate.o : kissat/allocate.c 
+	$(CC) $(KISSAT_FLAGS)  -o allocate.o kissat/allocate.c
+analyze.o : kissat/analyze.c 
+	$(CC) $(KISSAT_FLAGS)  -o analyze.o kissat/analyze.c
+ands.o : kissat/ands.c 
+	$(CC) $(KISSAT_FLAGS)  -o ands.o kissat/ands.c
+application.o : kissat/application.c 
+	$(CC) $(KISSAT_FLAGS)  -o application.o kissat/application.c
+arena.o : kissat/arena.c 
+	$(CC) $(KISSAT_FLAGS)  -o arena.o kissat/arena.c
+assign.o : kissat/assign.c 
+	$(CC) $(KISSAT_FLAGS)  -o assign.o kissat/assign.c
+autarky.o : kissat/autarky.c 
+	$(CC) $(KISSAT_FLAGS)  -o autarky.o kissat/autarky.c
+averages.o : kissat/averages.c 
+	$(CC) $(KISSAT_FLAGS)  -o averages.o kissat/averages.c
+backtrack.o : kissat/backtrack.c 
+	$(CC) $(KISSAT_FLAGS)  -o backtrack.o kissat/backtrack.c
+backward.o : kissat/backward.c 
+	$(CC) $(KISSAT_FLAGS)  -o backward.o kissat/backward.c
+build.o : kissat/build.c 
+	$(CC) $(KISSAT_FLAGS)  -o build.o kissat/build.c
+bump.o : kissat/bump.c 
+	$(CC) $(KISSAT_FLAGS)  -o bump.o kissat/bump.c
+check.o : kissat/check.c 
+	$(CC) $(KISSAT_FLAGS)  -o check.o kissat/check.c
+clueue.o : kissat/clueue.c 
+	$(CC) $(KISSAT_FLAGS)  -o clueue.o kissat/clueue.c
+collect.o : kissat/collect.c 
+	$(CC) $(KISSAT_FLAGS)  -o collect.o kissat/collect.c
+colors.o : kissat/colors.c 
+	$(CC) $(KISSAT_FLAGS)  -o colors.o kissat/colors.c
+compact.o : kissat/compact.c 
+	$(CC) $(KISSAT_FLAGS)  -o compact.o kissat/compact.c
+config.o : kissat/config.c 
+	$(CC) $(KISSAT_FLAGS)  -o config.o kissat/config.c
+decide.o : kissat/decide.c 
+	$(CC) $(KISSAT_FLAGS)  -o decide.o kissat/decide.c
+deduce.o : kissat/deduce.c 
+	$(CC) $(KISSAT_FLAGS)  -o deduce.o kissat/deduce.c
+dense.o : kissat/dense.c 
+	$(CC) $(KISSAT_FLAGS)  -o dense.o kissat/dense.c
+dump.o : kissat/dump.c 
+	$(CC) $(KISSAT_FLAGS)  -o dump.o kissat/dump.c
+eliminate.o : kissat/eliminate.c 
+	$(CC) $(KISSAT_FLAGS)  -o eliminate.o kissat/eliminate.c
+equivalences.o : kissat/equivalences.c 
+	$(CC) $(KISSAT_FLAGS)  -o equivalences.o kissat/equivalences.c
+error.o : kissat/error.c 
+	$(CC) $(KISSAT_FLAGS)  -o error.o kissat/error.c
+extend.o : kissat/extend.c 
+	$(CC) $(KISSAT_FLAGS)  -o extend.o kissat/extend.c
+failed.o : kissat/failed.c 
+	$(CC) $(KISSAT_FLAGS)  -o failed.o kissat/failed.c
+flags.o : kissat/flags.c 
+	$(CC) $(KISSAT_FLAGS)  -o flags.o kissat/flags.c
+format.o : kissat/format.c 
+	$(CC) $(KISSAT_FLAGS)  -o format.o kissat/format.c
+forward.o : kissat/forward.c 
+	$(CC) $(KISSAT_FLAGS)  -o forward.o kissat/forward.c
+frames.o : kissat/frames.c 
+	$(CC) $(KISSAT_FLAGS)  -o frames.o kissat/frames.c
+gates.o : kissat/gates.c 
+	$(CC) $(KISSAT_FLAGS)  -o gates.o kissat/gates.c
+handle.o : kissat/handle.c 
+	$(CC) $(KISSAT_FLAGS)  -o handle.o kissat/handle.c
+heap.o : kissat/heap.c 
+	$(CC) $(KISSAT_FLAGS)  -o heap.o kissat/heap.c
+ifthenelse.o : kissat/ifthenelse.c 
+	$(CC) $(KISSAT_FLAGS)  -o ifthenelse.o kissat/ifthenelse.c
+import.o : kissat/import.c 
+	$(CC) $(KISSAT_FLAGS)  -o import.o kissat/import.c
+internal.o : kissat/internal.c 
+	$(CC) $(KISSAT_FLAGS)  -o internal.o kissat/internal.c
+kissat_clause.o : kissat/kissat_clause.c 
+	$(CC) $(KISSAT_FLAGS)  -o kissat_clause.o kissat/kissat_clause.c
+kissat_dominate.o : kissat/kissat_dominate.c 
+	$(CC) $(KISSAT_FLAGS)  -o kissat_dominate.o kissat/kissat_dominate.c
+kissat_file.o : kissat/kissat_file.c 
+	$(CC) $(KISSAT_FLAGS)  -o kissat_file.o kissat/kissat_file.c
+kissat_main.o : kissat/kissat_main.c 
+	$(CC) $(KISSAT_FLAGS)  -o kissat_main.o kissat/kissat_main.c
+kissat_reduce.o : kissat/kissat_reduce.c 
+	$(CC) $(KISSAT_FLAGS)  -o kissat_reduce.o kissat/kissat_reduce.c
+learn.o : kissat/learn.c 
+	$(CC) $(KISSAT_FLAGS)  -o learn.o kissat/learn.c
+limits.o : kissat/limits.c 
+	$(CC) $(KISSAT_FLAGS)  -o limits.o kissat/limits.c
+logging.o : kissat/logging.c 
+	$(CC) $(KISSAT_FLAGS)  -o logging.o kissat/logging.c
+minimize.o : kissat/minimize.c 
+	$(CC) $(KISSAT_FLAGS)  -o minimize.o kissat/minimize.c
+mode.o : kissat/mode.c 
+	$(CC) $(KISSAT_FLAGS)  -o mode.o kissat/mode.c
+options.o : kissat/options.c 
+	$(CC) $(KISSAT_FLAGS)  -o options.o kissat/options.c
+parse.o : kissat/parse.c 
+	$(CC) $(KISSAT_FLAGS)  -o parse.o kissat/parse.c
+phases.o : kissat/phases.c 
+	$(CC) $(KISSAT_FLAGS)  -o phases.o kissat/phases.c
+print.o : kissat/print.c 
+	$(CC) $(KISSAT_FLAGS)  -o print.o kissat/print.c
+probe.o : kissat/probe.c 
+	$(CC) $(KISSAT_FLAGS)  -o probe.o kissat/probe.c
+profile.o : kissat/profile.c 
+	$(CC) $(KISSAT_FLAGS)  -o profile.o kissat/profile.c
+promote.o : kissat/promote.c 
+	$(CC) $(KISSAT_FLAGS)  -o promote.o kissat/promote.c
+proof.o : kissat/proof.c 
+	$(CC) $(KISSAT_FLAGS)  -o proof.o kissat/proof.c
+propdense.o : kissat/propdense.c 
+	$(CC) $(KISSAT_FLAGS)  -o propdense.o kissat/propdense.c
+prophyper.o : kissat/prophyper.c 
+	$(CC) $(KISSAT_FLAGS)  -o prophyper.o kissat/prophyper.c
+proprobe.o : kissat/proprobe.c 
+	$(CC) $(KISSAT_FLAGS)  -o proprobe.o kissat/proprobe.c
+propsearch.o : kissat/propsearch.c 
+	$(CC) $(KISSAT_FLAGS)  -o propsearch.o kissat/propsearch.c
+queue.o : kissat/queue.c 
+	$(CC) $(KISSAT_FLAGS)  -o queue.o kissat/queue.c
+reluctant.o : kissat/reluctant.c 
+	$(CC) $(KISSAT_FLAGS)  -o reluctant.o kissat/reluctant.c
+rephase.o : kissat/rephase.c 
+	$(CC) $(KISSAT_FLAGS)  -o rephase.o kissat/rephase.c
+report.o : kissat/report.c 
+	$(CC) $(KISSAT_FLAGS)  -o report.o kissat/report.c
+resize.o : kissat/resize.c 
+	$(CC) $(KISSAT_FLAGS)  -o resize.o kissat/resize.c
+resolve.o : kissat/resolve.c 
+	$(CC) $(KISSAT_FLAGS)  -o resolve.o kissat/resolve.c
+resources.o : kissat/resources.c 
+	$(CC) $(KISSAT_FLAGS)  -o resources.o kissat/resources.c
+restart.o : kissat/restart.c 
+	$(CC) $(KISSAT_FLAGS)  -o restart.o kissat/restart.c
+search.o : kissat/search.c 
+	$(CC) $(KISSAT_FLAGS)  -o search.o kissat/search.c
+smooth.o : kissat/smooth.c 
+	$(CC) $(KISSAT_FLAGS)  -o smooth.o kissat/smooth.c
+sort.o : kissat/sort.c 
+	$(CC) $(KISSAT_FLAGS)  -o sort.o kissat/sort.c
+stack.o : kissat/stack.c 
+	$(CC) $(KISSAT_FLAGS)  -o stack.o kissat/stack.c
+statistics.o : kissat/statistics.c 
+	$(CC) $(KISSAT_FLAGS)  -o statistics.o kissat/statistics.c
+strengthen.o : kissat/strengthen.c 
+	$(CC) $(KISSAT_FLAGS)  -o strengthen.o kissat/strengthen.c
+substitute.o : kissat/substitute.c 
+	$(CC) $(KISSAT_FLAGS)  -o substitute.o kissat/substitute.c
+terminate.o : kissat/terminate.c 
+	$(CC) $(KISSAT_FLAGS)  -o terminate.o kissat/terminate.c
+ternary.o : kissat/ternary.c 
+	$(CC) $(KISSAT_FLAGS)  -o ternary.o kissat/ternary.c
+trail.o : kissat/trail.c 
+	$(CC) $(KISSAT_FLAGS)  -o trail.o kissat/trail.c
+transitive.o : kissat/transitive.c 
+	$(CC) $(KISSAT_FLAGS)  -o transitive.o kissat/transitive.c
+utilities.o : kissat/utilities.c 
+	$(CC) $(KISSAT_FLAGS)  -o utilities.o kissat/utilities.c
+vector.o : kissat/vector.c 
+	$(CC) $(KISSAT_FLAGS)  -o vector.o kissat/vector.c
+vivify.o : kissat/vivify.c 
+	$(CC) $(KISSAT_FLAGS)  -o vivify.o kissat/vivify.c
+walk.o : kissat/walk.c 
+	$(CC) $(KISSAT_FLAGS)  -o walk.o kissat/walk.c
+watch.o : kissat/watch.c 
+	$(CC) $(KISSAT_FLAGS)  -o watch.o kissat/watch.c
+weaken.o : kissat/weaken.c 
+	$(CC) $(KISSAT_FLAGS)  -o weaken.o kissat/weaken.c
+witness.o : kissat/witness.c 
+	$(CC) $(KISSAT_FLAGS)  -o witness.o kissat/witness.c
+xors.o : kissat/xors.c 
+	$(CC) $(KISSAT_FLAGS)  -o xors.o kissat/xors.c

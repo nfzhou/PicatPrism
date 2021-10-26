@@ -1,0 +1,18 @@
+              kis_allocate.o kis_analyze.o kis_ands.o kis_application.o\
+              kis_arena.o kis_assign.o kis_autarky.o kis_averages.o kis_backtrack.o\
+              kis_backward.o kis_build.o kis_bump.o kis_check.o kis_clause.o\
+              kis_clueue.o kis_collect.o kis_colors.o kis_compact.o kis_config.o\
+              kis_decide.o kis_deduce.o kis_dense.o kis_dominate.o kis_dump.o\
+              kis_eliminate.o kis_equivalences.o kis_error.o kis_extend.o kis_failed.o\
+              kis_file.o kis_flags.o kis_format.o kis_forward.o kis_frames.o\
+              kis_gates.o kis_handle.o kis_heap.o kis_ifthenelse.o kis_import.o\
+              kis_internal.o kis_learn.o kis_limits.o kis_logging.o kis_main.o\
+              kis_minimize.o kis_mode.o kis_options.o kis_parse.o kis_phases.o\
+              kis_print.o kis_probe.o kis_profile.o kis_promote.o kis_proof.o\
+              kis_propdense.o kis_prophyper.o kis_proprobe.o kis_propsearch.o kis_queue.o\
+              kis_reduce.o kis_reluctant.o kis_rephase.o kis_report.o kis_resize.o\
+              kis_resolve.o kis_resources.o kis_restart.o kis_search.o kis_smooth.o\
+              kis_sort.o kis_stack.o kis_statistics.o kis_strengthen.o kis_substitute.o\
+              kis_terminate.o kis_ternary.o kis_trail.o kis_transitive.o kis_utilities.o\
+              kis_vector.o kis_vivify.o kis_walk.o kis_watch.o kis_weaken.o\
+              kis_witness.o kis_xors.o

@@ -1,0 +1,16 @@
+int pi_fann_get_layer_array(){
+	TERM nn = picat_get_call_arg(1, 2);
+	TERM ret = picat_get_call_arg(2, 2);
+
+	TERM nid = picat_get_arg(1, nn);
+	fann* ann = anns[picat_get_integer(nid)];
+	int num = fann_get_num_layers(ann);
+
+	fann_type *layers = (unsigned int *)malloc(num*sizeof(unsigned int)); 
+
+	fann_get_layer_array(ann, layers);
+	
+	return unsigned_int_array_to_picat_array(layers, num, ret);
+  }
+
+	struct fann *ann, unsigned int *layers);

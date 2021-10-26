@@ -1,0 +1,266 @@
+import prism.
+%%%%
+%%%%  Profile HMM --- phmm.psm
+%%%%      
+%%%%  Copyright (C) 2004,2006,2007,2008
+%%%%    Sato Laboratory, Dept. of Computer Science,
+%%%%    Tokyo Institute of Technology
+
+%%  Profile HMMs are a variant of HMMs that have three types of states,
+%%  i.e. `match state',`insert state' and `delete state.' Match states
+%%  constitute an HMM that outputs a `true' string. Insertion states
+%%  emit a symbol additionally to the `true' string whereas delete (skip)
+%%  states emit no symbol.
+%%
+%%  Profile HMMs are used to align amino-acid sequences by inserting
+%%  and skipping symbols as well as matching symbols.  For example
+%%  amino-acid sequences below
+%%
+%%  HLKIANRKDKHHNKEFGGHHLA
+%%  HLKATHRKDQHHNREFGGHHLA
+%%  VLKFANRKSKHHNKEMGAHHLA
+%%  ...
+%% 
+%%  are aligned by the profile HMM program in this file as follows.
+%%
+%%  -HLKIA-NRKDK-H-H----NKEFGGHH-LA
+%%  -HLK-A-T-HRK-DQHHN--R-EFGGHH-LA
+%%  -VLKFA-NRKSK-H-H----NKEMGAHH-LA
+%%  ...
+
+%%-------------------------------------
+%%  Quick start : sample session, align the sample data in phmm.dat.
+%%
+%%  To run on an interactive session:
+%%  picat> cl(phmm),go.         (ML/MAP)
+%%  picat> cl(phmm),go_vb.      (variational Bayes)
+%%
+
+main ?=> once(go), fail.
+main ?=> once(go_vb), fail.
+main => true.
+
+go =>
+   Gs = read_file_terms("phmm.dat"),   % Read the sequence data from phmm.dat.
+   init_set_sw,
+   learn(Gs),                   % Learn parameters from the data.
+   wmag(Gs).                    % Compute viterbi paths using the learned
+                                % parameters and aligns sequences in Gs.
+
+% To enable variational Bayes, we need some additional flag settings:
+go_vb =>
+   set_prism_flag(learn_mode,both),
+   set_prism_flag(viterbi_mode,hparams),
+   set_prism_flag(reset_hparams,on),
+   go.
+
+prism_main => go.
+%prism_main => go_vb.
+
+
+%%%--------------------- model ---------------------
+
+observe(Sequence) => hmm(Sequence,start).
+
+hmm(Sequence,end) => Sequence=[].
+hmm(Sequence,State) =>
+   State !== end,
+   msw($move_from(State),NextState),
+   msw($emit_at(State), Symbol),
+   ( Symbol = epsilon ->
+       hmm( Sequence, NextState )
+   ; Sequence = [Symbol|TailSeq],
+       hmm( TailSeq , NextState )
+   ).
+
+amino_acids(Acids) =>
+   Acids = ['A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R',
+			'S','T','V','W','X','Y'].
+hmm_len(Len) => Len=17.
+
+%%%--------------------- values ---------------------
+
+values(move_from(State),Values) =>
+   hmm_len(Len),
+   get_index(State,X),
+   ( 0 =< X, X < Len ->
+       Y is X + 1,
+       Values = $[insert(X),match(Y),delete(Y)]
+   ; Values = [$insert(X),end] ).
+
+values(emit_at(State),Vs) =>
+   ((State = $insert(_) ; State = $match(_)) ->
+       amino_acids(Vs)
+   ; Vs = [epsilon] ).
+
+%%%--------------------- set_sw ---------------------
+
+% :- init_set_sw.
+
+init_set_sw =>
+%  tell('/dev/null'),           % Suppress output (on Linux only)
+   set_sw( $move_from(start) ),
+   set_sw( $move_from(insert(0)) ),
+   set_sw( $emit_at(start) ),
+   set_sw( $emit_at(insert(0)) ),
+   hmm_len(Len),
+%  told,
+   init_set_sw(Len).
+
+init_set_sw(0) => true.
+init_set_sw(X) =>
+   set_sw( $move_from(insert(X)) ),
+   set_sw( $move_from(match(X)) ),
+   set_sw( $move_from(delete(X)) ),
+   set_sw( $emit_at(insert(X)) ),
+   set_sw( $emit_at(match(X)) ),
+   set_sw( $emit_at(delete(X)) ),
+   Y is X - 1,
+   init_set_sw(Y).
+
+%%%--------------------- estimation ---------------------
+%% most likely path
+%% mlpath(['A','E'],Path) => Path = [start,match(1),end]
+
+mlpath(Sequence,Path) =>
+   mlpath(Sequence,Path,_).
+
+mlpath(Sequence,Path,Prob) =>
+   viterbif($hmm(Sequence,start),Prob,Nodes),
+   nodes2path(Nodes,Path).
+
+nodes2path([Node|Nodes],Path) =>
+   Path = [State|PathR],
+   Node = $node(hmm(_,State),_),
+   nodes2path(Nodes,PathR).
+nodes2path([],Path) => Path=[].
+
+mlpaths([Seq|Seqs],Paths) =>
+   Paths = [Path|PathsR],
+   mlpath(Seq,Path),
+   mlpaths(Seqs,PathsR).
+mlpaths([],Paths) => Paths = [].
+
+%%%--------------------- alignment ---------------------
+
+wmag(Gs) =>
+   seqs2goals(S,Gs),wma(S).
+
+wma(Seqs) =>
+   write_multiple_alignments(Seqs).
+
+write_multiple_alignments(Seqs) =>
+   nl,
+   print("search Viterbi paths..."),nl,
+   mlpaths(Seqs,Paths),
+   print('done.'),
+   nl,
+   print("------------ALIGNMENTS------------"),
+   nl,
+   write_multiple_alignments( Seqs, Paths ),
+   print("----------------------------------"),
+   nl.
+
+make_max_length_list([Path],MaxLenList) =>
+   make_length_list(Path,MaxLenList).
+make_max_length_list([Path|Paths],MaxLenList) =>
+   make_max_length_list(Paths, TmpLenList),
+   make_length_list(Path,LenList),
+   marge_len_list(LenList,TmpLenList,MaxLenList).
+
+marge_len_list([H1|T1],TmpLenList,MaxLenList) =>
+   TmpLenList = [H2|T2],
+   MaxLenList = [MargedH|MargedT],
+   max(MargedH,[H1,H2]),
+   marge_len_list(T1,T2,MargedT).
+marge_len_list([],TmpLenList,MaxLenList) =>
+   TmpLenList = [], MaxLenList = [].
+
+%% make_length_list([start,insert(0),match(1),end],LenList)
+%% -> LenList = [2,1]
+%% make_length_list([start,delete(1),insert(1),insert(1),end],LenList)
+%% -> LenList = [1,1]
+
+make_length_list([end],LenList) =>
+   LenList = [].
+make_length_list(Path,LenList) =>
+   LenList = [Len|LenListR],
+   count_emission(Path,Len,NextIndexPath),
+   make_length_list(NextIndexPath,LenListR).
+
+count_emission(Path,Count,NextIndexPath) =>
+   Path = [State|_],
+   get_index(State,Index),
+   count_emission2(Path,Count,Index,NextIndexPath).
+
+%% count_emission2([start,insert(0),match(1),end],Count,0,NextIndexPath)
+%% -> Count = 2, NextIndexPath = [match(1),end]
+%% count_emission2([delete(1),insert(1),insert(1),end],Count,1,NextIndexPath)
+%% -> Count = 2, NextIndexPath = [end]
+
+count_emission2([State|Path],Count,Index,NextIndexPath) =>
+   ( get_index(State,Index) ->
+       count_emission2( Path, Count2, Index, NextIndexPath ),
+       ( (State = $delete(_); State==start) ->
+           Count = Count2
+       ; Count is Count2 + 1 )
+   ; Count = 0,
+       NextIndexPath = [State|Path]
+   ).
+
+write_multiple_alignments(Seqs,Paths) =>
+   make_max_length_list(Paths,LenList),
+   write_multiple_alignments(Seqs,Paths,LenList).
+
+write_multiple_alignments([Seq|Seqs],[Path|Paths],LenList) =>
+   write_alignment(Seq,Path,LenList),
+   write_multiple_alignments(Seqs,Paths,LenList).
+write_multiple_alignments([],[],_) => true.
+
+write_alignment(Seq,Path,LenList) =>
+   write_alignment(Seq,Path,LenList,0).
+
+write_alignment([],[end],[],_) => nl.
+write_alignment(Seq,[State|Path],LenList,Index) ?=>
+   get_index(State,Index),
+   ( (State = $delete(_) ; State == start) ->
+       write_alignment( Seq, Path, LenList, Index )
+   ; Seq = [Symbol|Seq2],
+       LenList = [Len|LenList2],
+       print(Symbol),
+       Len2 is Len - 1,
+       write_alignment(Seq2,Path,[Len2|LenList2],Index)
+   ).
+write_alignment(Seq,[State|Path],LenList,Index) =>
+   LenList = [Len|LenList2],
+   Index2 is Index + 1,
+   pad(Len),
+   write_alignment(Seq,[State|Path],LenList2,Index2).
+
+pad(Len), 
+   Len > 0
+=>
+   print('-'),
+   Len2 is Len - 1,
+   pad(Len2).
+pad(0) => true.
+
+%%%--------------------- utility ---------------------
+
+get_index(match(I),Index) => Index=I.
+get_index(insert(I),Index) => Index=I.
+get_index(delete(I),Index) => Index=I.
+get_index(start,Index) => Index=0.
+get_index(end,Index) => hmm_len(X),Index is X+1.
+
+seqs2goals(Seqs,[Goal|Goals]) =>
+   Seqs = [Seq|SeqsR],
+   Goal = $observe(Seq),
+   seqs2goals(SeqsR,Goals).
+seqs2goals(Seqs,[]) => Seqs = [].
+
+max(Max,[E]) => Max = E.
+max(Max,[Head|Tail]) =>
+   max(Tmp,Tail),
+   ( Tmp > Head -> Max = Tmp ; Max = Head ).
+

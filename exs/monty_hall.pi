@@ -1,0 +1,24 @@
+/*
+   A translation of the ProbLog encoding of the Monty-Hall puzzle at:
+   https://dtai.cs.kuleuven.be/problog/tutorial/various/01_montyhall.html
+*/   
+import prism.
+
+values(choice1,[goat1,goat2,car]).
+values(reveal(car),[goat1,goat2]).
+values(reveal(goat1),[goat2]).
+values(reveal(goat2),[goat1]).
+
+main =>
+    set_sw(choice1, [1/3, 1/3, 1/3]),
+    set_sw($reveal(car), [1/2, 1/2]),
+    prob(keep_get_car),
+    prob(switch_get_car).
+
+keep_get_car =>
+    msw(choice1,car).
+
+switch_get_car =>
+    msw(choice1,O1),
+    msw($reveal(O1),R),
+    [car] = delete(delete([goat1,goat2,car],O1),R).

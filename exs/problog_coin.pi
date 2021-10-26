@@ -1,0 +1,27 @@
+/*
+	See a ProbLog encoding here: https://dtai.cs.kuleuven.be/problog/tutorial/basic/01_coins.html
+*/
+
+import prism.
+
+% Probabilistic facts:
+values(coin1, [heads,tails]).
+values(coin2, [heads,tails]).
+
+main :-
+    set_sw(coin1,[0.5,0.5]),
+    set_sw(coin2,[0.6,0.4]),
+    show_sw,
+	println(twoHeads),
+    prob(twoHeads),
+	println(someHeads),
+    prob(someHeads),
+	println(someHeads4),
+    prob(someHeads4).
+
+twoHeads :- msw(coin1,heads), msw(coin2,heads).
+
+someHeads :- msw(coin1,O1), msw(coin2,O2), (O1,O2) != (tails,tails).
+
+someHeads4 :- msw(coin2,O1), msw(coin2,O2), msw(coin2,O3), msw(coin2,O4), (O1,O2,O3,O4) != (tails,tails,tails,tails).
+

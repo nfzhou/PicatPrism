@@ -1,0 +1,13 @@
+import os.
+
+main =>
+    Fs = listdir("."),
+	foreach (F in Fs, append(MainStr,".c",F))
+	    printf("%s.o : kissat/%s.c \n",MainStr,MainStr),
+	    printf("\t$(CC) $(KISSAT_FLAGS)  -o %s.o kissat/%s.c\n",MainStr,MainStr)
+	end.
+	
+		
+		
+	    
+	

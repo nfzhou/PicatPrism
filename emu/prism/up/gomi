@@ -1,0 +1,20 @@
+		    
+		    
+		
+	    
+    Ls = read_file_lines("t"),
+	PRISM_DIR = "prism/up/",
+	foreach (L in Ls)
+	    trans_line(L,PRISM_DIR)
+    end.
+
+trans_line(L,PRISM_DIR) =>
+    append(Pre,":",Pos,L),
+	append(Main,".$(O)",_,Pre),
+	if exists(Main++".c") then
+	    printf("%s.o : %s%s\n", Main, PRISM_DIR, Main++".c"),
+		printf("    $(CC) $(PRISMFLAG) %s%s\n", PRISM_DIR, Main++".c")
+	else
+	    printf("%s.o : %s%s\n", Main, PRISM_DIR, Main++".cpp"),
+		printf("    $(CPP) $(PRISMFLAG) %s%s\n", PRISM_DIR, Main++".cpp")
+	end.

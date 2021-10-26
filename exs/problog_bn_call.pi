@@ -1,0 +1,30 @@
+/*
+	See a ProbLog encoding here: https://dtai.cs.kuleuven.be/problog/tutorial/mpe/01_bn.html
+*/	
+import prism.
+
+values(_,[yes,no]).
+
+main =>
+    set_sw(burglary,[0.7,0.3]),
+    set_sw(earthquake,[0.2,0.8]),
+    set_sw($alarm(yes,yes),[0.9,0.1]),
+    set_sw($alarm(yes,no),[0.8,0.2]),
+    set_sw($alarm(no,yes),[0.1,0.9]),
+    set_sw($alarm(no,no),[0.0,1.0]),
+    set_sw($call(yes),[0.8,0.2]),
+    set_sw($call(no),[0.1,0.9]),
+    %
+    prob($world(yes,_,_,yes,yes),P1),
+    prob($world(_,_,_,yes,yes),P2),
+    printf("P(burglary|john,marry) = %f\n",P1/P2),
+    %
+    prob($world(_,yes,_,yes,yes),P3),
+    printf("P(burglary|john,marry) = %f\n",P3/P2).
+
+world(B,E,A,J,M) =>
+    msw(burglary,B),
+    msw(earthquake,E),
+    msw($alarm(B,E),A),
+    msw($call(A),J),
+    msw($call(A),M).
