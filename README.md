@@ -10,7 +10,9 @@ prism module.
 A program that uses the prism module must begin with the
 following declaration:
 
+...
 import prism.
+...
 
 which makes PRISM's built-ins visible to Picat. A prism
 program must include a predicate, named values(I,Os), which
