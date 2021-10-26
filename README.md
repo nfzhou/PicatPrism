@@ -33,6 +33,7 @@ http://picat-lang.org/download/prism.pi
 
 Below is the source code of the program "direction.pi":
 
+```
 import prism.
 
 values(coin, [head,tail]).
@@ -40,9 +41,11 @@ values(coin, [head,tail]).
 direction(D) =>
     msw(coin,Face),
     (Face == head -> D = left; D = right).
+```
 
 The following commands illustrate how to run the program:
 
+```
 c:\picat\work\picat               % start picat_prism
 
 Picat> cl(direction).             % compile and load the program
@@ -65,7 +68,8 @@ Picat> learn($[direction(left),direction(left),direction(right)])
 
 Picat> show_sw
 Switch coin: unfixed_p: head (p: 0.666666667) tail (p: 0.333333333)
+```
 
 This porting of PRISM to Picat was done by Neng-Fa Zhou while he was
 a research fellow working with Vijay Saraswat at Goldman Sachs in
-the summer of 2020.
+the summer of 2019.
