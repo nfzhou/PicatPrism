@@ -1090,6 +1090,10 @@ int c_IS_SMALL_INT_c() {
 extern int fann_cpreds();
 #endif
 
+#ifdef PRISM
+extern void bp4p_register_preds();
+#endif
+
 void Cboot() {
     insert_cpred("c_format_set_dest", 1, c_format_set_dest);
     insert_cpred("c_format_get_line_pos", 1, c_format_get_line_pos);
