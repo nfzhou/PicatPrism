@@ -1,5 +1,5 @@
-CPP    = /usr/bin/g++ -std=c++11 -DGC -DGCC -DPICAT -DSAT -DM64BITS
-CC     = /usr/bin/gcc -DGCC -DPICAT -DSAT -DM64BITS
+CPP    = /usr/bin/g++ -std=c++11 -DGC -DGCC -DPICAT -DSAT -DM64BITS -DFANN_NO_DLL -DFANN -DPRISM 
+CC     = /usr/bin/gcc -DGCC -DPICAT -DSAT -DM64BITS -DFANN_NO_DLL -DFANN -DPRISM
 #CC     = cc
 
 #CFLAGS = -c  -O4 -Dunix -DGC -DBSD             #SunOS
