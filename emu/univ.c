@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : cpreds.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
  *   Purpose: Implementation of =../2
 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,8 +12,7 @@
 #include "term.h"
 #include "bapi.h"
 
-BPLONG univ_lst2str(L)
-    BPLONG L;
+BPLONG univ_lst2str(BPLONG L)
 {
     BPLONG temp, Head, top1, orig_L;
     SYM_REC_PTR psc_ptr;
@@ -93,8 +92,7 @@ restart:
 }
 
 
-BPLONG univ_str2lst(op1)
-    BPLONG op1;
+BPLONG univ_str2lst(BPLONG op1)
 {
     BPLONG temp, tempL, Head;
     SYM_REC_PTR psc_ptr;
@@ -148,8 +146,7 @@ BPLONG univ_str2lst(op1)
     return tempL;
 }
 
-int list_length(L, orig_L)
-    BPLONG L, orig_L;
+int list_length(BPLONG L, BPLONG orig_L)
 {
     BPLONG_PTR top;
     int i;
@@ -172,8 +169,7 @@ restart:
 }
 
 
-int b_UNIV_cc(op1, op2)
-    BPLONG op1, op2;
+int b_UNIV_cc(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
     BPLONG tmp_op;

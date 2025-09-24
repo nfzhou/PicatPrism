@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : basic.h
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2022
 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -42,8 +42,10 @@
 #define READFLAG 0
 #ifdef BPSOLVER
 #define BUCKET_CHAIN  65536
+#define MODULE_BUCKET_CHAIN  500
 #else
 #define BUCKET_CHAIN 999983
+#define MODULE_BUCKET_CHAIN  5000
 #endif
 #define BP_ERROR -1
 #define BP_FALSE 0
@@ -67,9 +69,9 @@
 // #define LARGE_MARGIN 12500
 #define LARGE_MARGIN 125000
 
-/* maximum and minimum integers that are represented in one word */
 #define MAX_CHARS_IN_POOL 10000
 
+/* maximum and minimum integers that are represented in one word */
 #define BP_BIGINT_BASE 268435456
 
 #define BP_IN_1W_INT_RANGE(op) ((op) >= BP_MININT_1W && (op) <= BP_MAXINT_1W)
@@ -123,8 +125,18 @@ typedef struct sym_rec {
     UW32 arity;
     CHAR_PTR nameptr;
     SYM_REC_PTR next;
-    int (*ep)(void);  /* entry point to byte code,global var, c function */
+    int (*ep)(void);  /* entry point to byte code, global var, c function */
 } SYM_REC;
+
+typedef struct module_sym_rec *MODULE_SYM_REC_PTR;
+
+typedef struct module_sym_rec {
+    BPLONG func;      /* the name of the predicate or function, an atom */
+    BYTE type;        /* predicate = 0, function = 1 */
+    BPLONG module;    /* the name of the module, an atom */
+    BPLONG mq_func;   /* module qualified functor, e$$module$$sym or "e$$module$$f$$sym */
+    MODULE_SYM_REC_PTR next;
+} MODULE_SYM_REC;
 
 typedef struct event_func_data {
     SYM_REC_PTR func;
@@ -360,7 +372,8 @@ extern int event_flag[MAXTRIGGERS];
 extern BPLONG event_object[MAXTRIGGERS];
 extern BPLONG_PTR triggering_frame[MAXTRIGGERS];  /* list of awaken frames  */
 extern BPLONG trigger_no;
-extern SYM_REC_PTR hash_table[BUCKET_CHAIN];
+extern SYM_REC_PTR sym_hash_table[BUCKET_CHAIN];
+// extern MODULE_SYM_REC_PTR module_sym_hash_table[MODULE_BUCKET_CHAIN];
 extern BPLONG char_sym_table[AlphabetSize];
 extern BPLONG number_of_symbols;
 extern BPULONG toam_signal_vec;
@@ -384,6 +397,8 @@ extern BPLONG_PTR global_unnumbervar_ptr;
 extern BPLONG_PTR global_unnumbervar_watermark;
 
 extern BPLONG bp_exception;
+extern BPLONG bp_stacktrace_lst;
+
 extern SYM_REC_PTR list_psc;
 extern SYM_REC_PTR equal_psc;
 extern SYM_REC_PTR planner_explored_depth_psc;
@@ -406,6 +421,9 @@ extern SYM_REC_PTR address_psc;
 extern SYM_REC_PTR socket_psc;
 extern SYM_REC_PTR stream_psc;
 extern SYM_REC_PTR bigint_psc;
+#ifdef XCSP_PICAT
+extern SYM_REC_PTR xcsp_vx_psc;
+#endif
 extern SYM_REC_PTR timer_psc;
 extern SYM_REC_PTR enter_dyn_call;
 extern SYM_REC_PTR enter_catch_call;
@@ -602,6 +620,7 @@ et_OUT_OF_MEMORY,
     et_NON_EMPTY_LIST,
     et_NOT_LESS_THAN_ZERO,
     et_NUMBER,
+    et_NEGATION,
     et_OPEN,
     et_OPERATOR,
     et_OPERATOR_PRIORITY,

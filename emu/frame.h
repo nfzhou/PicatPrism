@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : frame.h
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2022
 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -101,11 +101,11 @@ subgoalTable -> bucket[0]
 subgoalTableEntry ->
                 NEXT
                 ANSWER_TABLE
-                        STATE           // looping or normal or revised
+                STATE           // looping or normal or revised
                 MASTER_AR       // point to the frame of the master. If 
                                 // complete, MASTER_AR becomes SUBGOAL_COMPLETE
-                        SCC_ROOT        // root subgoal of the SCC this subgoal belongs to
-                        SCC_ELMS        // list of nodes in the SCC rooted at this node
+                SCC_ROOT        // root subgoal of the SCC this subgoal belongs to
+                SCC_ELMS        // list of nodes in the SCC rooted at this node
                 SYM
                 args
 
@@ -189,8 +189,8 @@ subgoalTableEntry ->
 
 /************************************************
 answerTable ->  SIZE
-                    FIRST
-                    LAST
+                FIRST
+                LAST
                 COUNT
                 BUCKET_PTR
 

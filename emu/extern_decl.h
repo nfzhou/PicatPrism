@@ -177,6 +177,7 @@ extern int b_DYN_PRED_CLAUSE_COUNT_cf(BPLONG Head, BPLONG Count);
 extern int b_GET_PICAT_GLOBAL_MAP_cf(BPLONG map_id, BPLONG map_num);
 extern int b_PICAT_GLOBAL_MAP_PUT_ccc(BPLONG map_num, BPLONG key, BPLONG val);
 extern int b_PICAT_GLOBAL_MAP_GET_ccf(BPLONG map_num, BPLONG key, BPLONG val);
+extern int c_PICAT_GLOBAL_MAP_DEL_cc();
 extern int b_PICAT_GLOBAL_MAP_SIZE_cf(BPLONG map_num, BPLONG size);
 extern int b_PICAT_GLOBAL_MAP_CLEAR_c(BPLONG map_num);
 extern int b_PICAT_GLOBAL_MAP_KEYS_cf(BPLONG map_num, BPLONG keys);
@@ -746,7 +747,8 @@ extern int bp_write_double_update_pos(BPLONG op);
 extern int bp_write_bigint(BPLONG op);
 extern int bp_write_bigint_update_pos(BPLONG op);
 extern int check_file_term(BPLONG term);
-extern int get_file_name(BPLONG op);
+extern char *get_file_name(BPLONG op);
+extern char *expand_file_name(char *s);
 extern void bp_write_pname(CHAR_PTR name_ptr);
 extern int bp_write_pname_update_pos(CHAR_PTR name_ptr, BPLONG length);
 extern int graphic_char(char ch);
@@ -865,6 +867,8 @@ extern int b_READ_FILE_CODES_cf(BPLONG FDIndex, BPLONG Lst);
 extern int b_READ_LINE_cf(BPLONG FDIndex, BPLONG Lst);
 extern int b_WRITE_BYTE_cc(BPLONG FDIndex, BPLONG Byt);
 extern int b_PICAT_PRINT_STRING_cc(BPLONG FDIndex, BPLONG Lst);
+extern int b_PICAT_PRINT_PRIMITIVE_cc(BPLONG FDIndex, BPLONG Term);
+extern int b_PICAT_WRITE_PRIMITIVE_cc(BPLONG FDIndex, BPLONG Term);
 extern int b_SET_STRING_TO_PARSE_c(BPLONG Str);
 extern void c_str_to_picat_str(CHAR_PTR str, BPLONG lst, BPLONG lstr);
 extern BPLONG c_str_to_picat_str0(CHAR_PTR str);
@@ -1019,25 +1023,32 @@ extern int load_syms(BPLONG file_type);
 extern int load_text(void);
 extern int load_hashtab(void);
 extern int get_index_tab(BPLONG clause_no, BPLONG_PTR lenptr);
+extern void get_index_tab_fromlist(BPLONG HashArgs, BPLONG clause_no);
 extern BPLONG_PTR gen_index(BPLONG hash_inst_addr, BPLONG clause_no, BPLONG alt);
 extern BPLONG bp_hsize(BPLONG numentry);
 extern int dyn_loader(SYM_REC_PTR sym_ptr, BPLONG file_type, BPLONG load_damon);
 extern SYM_REC_PTR insert(const char *name, BPLONG length, BPLONG arity);
 extern SYM_REC_PTR insert_sym(const char *name, BPLONG length, BPLONG arity);
 extern SYM_REC_PTR insert_cpred(CHAR_PTR name, BPLONG arity, int (*func)(void));
-extern int set_temp_ep(SYM_REC_PTR sym_ptr, BPLONG ep);
+extern void set_temp_ep(SYM_REC_PTR sym_ptr, BPLONG ep);
 extern void set_real_ep(SYM_REC_PTR sym_ptr, CHAR_PTR base);
 extern CHAR_PTR namestring(SYM_REC_PTR sym_ptr, CHAR_PTR s);
 extern int c_CURRENT_PREDICATE(void);
 extern int c_CURRENT_PREDICATES(void);
-extern SYM_REC_PTR look_for_sym_with_entrance(BPLONG_PTR p);
 extern int c_LOAD_BYTE_CODE_FROM_BPLISTS();
 extern int c_GET_MODULE_SIGNATURE_cf();
 extern int load_byte_code_from_c_array();
+extern void load_syms_from_c_array();
+extern void load_text_from_c_array();
+extern void load_hashtab_from_c_array();
+extern void load_syms_fromlist(BPLONG BCSyms);
+extern void load_text_fromlist(BPLONG BCInsts);
+extern void load_hashtab_fromlist(BPLONG BCHashTabs);
+
 extern BPLONG bp_prime(BPLONG numentry);
-extern SYM_REC_PTR look_for_sym_with_entrance(BPLONG_PTR p);
 extern int c_LOAD_BYTE_CODE_FROM_BPLISTS();
 extern int c_GET_MODULE_SIGNATURE_cf();
+extern void register_module_sym(CHAR_PTR name, int len, SYM_REC_PTR name_sym);
 
 //[]
 //      mic.c prototypes
@@ -1175,6 +1186,7 @@ extern int b_TO_QUOTED_STRING_cff(BPLONG term, BPLONG lst, BPLONG lstr);
 extern int b_TO_CODES_cff(BPLONG term, BPLONG lst, BPLONG lstr);
 extern int b_NEW_STRUCT_ccf(BPLONG name, BPLONG arity, BPLONG term);
 extern int c_is_picat_public_name();
+extern int b_is_picat_public_name(BPLONG term);
 
 /**/
 
@@ -1296,6 +1308,7 @@ extern int table_statistics();
 extern int b_PLANNER_CURR_RPC_fff(BPLONG, BPLONG, BPLONG);
 extern int b_TABLE_MAP_PUT_cc(BPLONG, BPLONG);
 extern int b_TABLE_MAP_GET_cf(BPLONG, BPLONG);
+extern int c_PICAT_TABLE_MAP_DEL_cc();
 extern int b_IS_PLANNER_STATE_c(BPLONG state);
 extern int b_PLANNER_UPDATE_EXPLORED_DEPTH_c(BPLONG depth);
 extern int c_TA_TOP_f();
@@ -1308,9 +1321,6 @@ extern int b_PICAT_TABLE_MAP_KEYS_cf(BPLONG map_num, BPLONG keys);
 extern int b_PICAT_TABLE_MAP_VALS_cf(BPLONG map_num, BPLONG vals);
 extern int b_PICAT_TABLE_MAP_LIST_cf(BPLONG map_num, BPLONG pairs);
 extern BPLONG table_maps_buckets_size();
-extern void reset_temp_complete_subgoal_entries();
-void reset_temp_complete_scc_elms(BPLONG_PTR subgoal_entry);
-
 //[]
 //      toam.c prototypes
 //[]
@@ -1380,10 +1390,6 @@ extern int b_UNIV_cc(BPLONG op1, BPLONG op2);
 //      sat_bp.c prototypes
 //[]
 extern int c_sat_init();
-extern int c_sat_start_dump();
-extern int c_sat_stop_dump();
-extern int c_sat_start_count();
-extern int c_sat_stop_count();
 extern int b_SAT_ADD_CL_c(BPLONG lit);
 extern int b_SAT_RETRIEVE_BNUM_cff(BPLONG BV, BPLONG Num, BPLONG MNum);
 extern int b_SAT_GET_INC_VAR_NUM_f(BPLONG Num);

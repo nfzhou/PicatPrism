@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : debug.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
  *   Purpose: debugging primitives
 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,7 +16,7 @@
 #include "dynamic.h"
 
 BPLONG skip_call_no;  /*all frames under this frame are skipped */
-static BPLONG dg_print_depth = 10;
+static BPLONG dg_print_depth = 8;
 static int dg_undo_mode = 0;
 
 /* Functions for manipulating the db_flag_word    */
@@ -102,13 +102,18 @@ int c_add_spy_point() {
     name = ARG(1, 2);
     arity = ARG(2, 2);
     GET_GLOBAL_SYM(name, arity, sym_ptr);
-	dg_flag_word = DG_FLAG_SPY;
-    if (GET_SPY(sym_ptr) == 0) {
-        GET_SPY(sym_ptr) = 1;
-        number_of_spy_points++;
-        return BP_TRUE;
-    } else 
-	  return BP_FALSE;
+    if (dg_flag_word == 0){
+        printf("Not in debug mode. Use the command 'debug' to switch to debug mode before cl.\n");
+        return BP_FALSE;
+    } else {
+        dg_flag_word = DG_FLAG_SPY;
+        if (GET_SPY(sym_ptr) == 0) {
+            GET_SPY(sym_ptr) = 1;
+            number_of_spy_points++;
+            return BP_TRUE;
+        } else 
+            return BP_FALSE;
+    }
 }
 
 int c_get_spy_points() {
@@ -120,7 +125,7 @@ int c_get_spy_points() {
 
     temp1 = nil_sym;
     for (i = 0; i < BUCKET_CHAIN; ++i) {
-        sym_ptr = hash_table[i];
+        sym_ptr = sym_hash_table[i];
         while (sym_ptr != NULL) {
             if (GET_SPY(sym_ptr) == 1) {
                 cell = ADDTAG(insert_sym(GET_NAME(sym_ptr), GET_LENGTH(sym_ptr), 0), ATM);
@@ -143,7 +148,7 @@ int c_remove_spy_points() {
 
 
     for (i = 0; i < BUCKET_CHAIN; ++i) {
-        sym_ptr = hash_table[i];
+        sym_ptr = sym_hash_table[i];
         while (sym_ptr != NULL) {
             if (GET_SPY(sym_ptr) == 1) GET_SPY(sym_ptr) = 0;
             sym_ptr = GET_NEXT(sym_ptr);

@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : kapi.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
  *   Purpose: External language interface
 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,7 +21,6 @@
 
 SYM_REC_PTR objectRef;
 extern char *string_in;
-char *bp_get_name();
 
 /* Prolog to C */
 /*
@@ -30,19 +29,16 @@ char *bp_get_name();
   return INTVAL(term);
   }
 */
-double PvalueOfReal(term)
-    BPLONG term;
+double PvalueOfReal(BPLONG term)
 {
     BPLONG_PTR top;
 
-    double floatval();
     DEREF(term);
     return floatval(term);
 }
 
 
-BPLONG PvalueOfAddr(term)
-    BPLONG term;
+BPLONG PvalueOfAddr(BPLONG term)
 {
     BPULONG w1, w2;
     BPLONG_PTR top;
@@ -54,8 +50,7 @@ BPLONG PvalueOfAddr(term)
     return (w2 << HALF_WORD_LONG | w1);
 }
 
-char* PnumberToStr(term)
-    BPLONG term;
+char* PnumberToStr(BPLONG term)
 {
     printf("PnumberToStr used\n");
     return " ";
@@ -63,8 +58,7 @@ char* PnumberToStr(term)
 
 /* Manipulate compound terms */
 
-UW32 ParityOfCompound(term)
-    BPLONG term;
+UW32 ParityOfCompound(BPLONG term)
 {
     BPLONG_PTR top;
 
@@ -72,45 +66,36 @@ UW32 ParityOfCompound(term)
     return GET_ARITY(GET_SYM_REC(term));
 }
 
-BPLONG PargOfCompound(term, n)
-    BPLONG term;
-    BPLONG n;
+BPLONG PargOfCompound(BPLONG term, BPLONG n)
 {
     return picat_get_arg(n+1, term);
 }
 
 /* Return functors as strings*/
 
-char *PascOfFunc(term)
-    BPLONG term;
+char *PascOfFunc(BPLONG term)
 {
     return bp_get_name(term);
 }
 
-char *PascOfAtom(term)
-    BPLONG term;
+char *PascOfAtom(BPLONG term)
 {
     return bp_get_name(term);
 }
 
-char *PnameToAsc(term)
-    BPLONG term;
+char *PnameToAsc(BPLONG term)
 {
     printf("PnameToAsc used \n");
     return " ";
 }
 
 /* UNIFY */
-int Punify(term1, term2)
-    BPLONG term1;
-    BPLONG term2;
+int Punify(BPLONG term1, BPLONG term2)
 {
     return unify(term1, term2);
 }
 
-int PuInt(term, i)
-    BPLONG term;
-    BPLONG i;
+int PuInt(BPLONG term, BPLONG i)
 {
     BPLONG op;
 
@@ -118,24 +103,18 @@ int PuInt(term, i)
     return unify(term, op);
 }
 
-int PuAtom(term, str)
-    BPLONG term;
-    char *str;
+int PuAtom(BPLONG term, char *str)
 {
     BPLONG op = picat_build_atom(str);
     return unify(term, op);
 }
 
-void PuStr(term, str)
-    BPLONG term;
-    char *str;
+void PuStr(BPLONG term, char *str)
 {
     string2codes(str, term);
 }
 
-int PuAddr(term, a)
-    BPLONG term;
-    void *a;
+int PuAddr(BPLONG term, void *a)
 {
     register BPLONG temp;
 
@@ -146,9 +125,7 @@ int PuAddr(term, a)
     return unify(term, temp);
 }
 
-int PuReal(term, d)
-    BPLONG term;
-    double d;
+int PuReal(BPLONG term, double d)
 {
     return unify(term, encodefloat1(d));
 }
@@ -158,22 +135,17 @@ BPLONG PnewVar() {
     return picat_build_var();
 }
 
-BPLONG Patom(str)
-    char *str;
+BPLONG Patom(char *str)
 {
     return picat_build_atom(str);
 }
 
-BPLONG create_FUNCTOR(name, arity)
-    char * name;
-    BPLONG arity;
+BPLONG create_FUNCTOR(char *name, BPLONG arity)
 {
     return bp_build_structure(name, arity);
 }
 
-BPLONG Pfunctorn(name, arity)
-    BPLONG name;
-    BPLONG arity;
+BPLONG Pfunctorn(BPLONG name, BPLONG arity)
 {
     char *str;
 
@@ -182,8 +154,7 @@ BPLONG Pfunctorn(name, arity)
 }
 
 /* Manipulate lists */
-BPLONG get_CAR(term)
-    BPLONG term;
+BPLONG get_CAR(BPLONG term)
 {
     BPLONG_PTR top;
 
@@ -191,8 +162,7 @@ BPLONG get_CAR(term)
     return *((BPLONG_PTR)UNTAGGED_ADDR(term));
 }
 
-BPLONG PlistCar(term)
-    BPLONG term;
+BPLONG PlistCar(BPLONG term)
 {
     BPLONG_PTR top;
 
@@ -200,8 +170,7 @@ BPLONG PlistCar(term)
     return *((BPLONG_PTR)UNTAGGED_ADDR(term));
 }
 
-BPLONG get_CDR(term)
-    BPLONG term;
+BPLONG get_CDR(BPLONG term)
 {
     BPLONG_PTR top;
 
@@ -209,8 +178,7 @@ BPLONG get_CDR(term)
     return *((BPLONG_PTR)UNTAGGED_ADDR(term)+1);
 }
 
-BPLONG PlistCdr(term)
-    BPLONG term;
+BPLONG PlistCdr(BPLONG term)
 {
     BPLONG_PTR top;
 
@@ -218,8 +186,7 @@ BPLONG PlistCdr(term)
     return *((BPLONG_PTR)UNTAGGED_ADDR(term)+1);
 }
 
-BPLONG PlistLength(term)
-    BPLONG term;
+BPLONG PlistLength(BPLONG term)
 {
     register BPLONG len = 0;
     BPLONG_PTR top;
@@ -233,8 +200,7 @@ BPLONG PlistLength(term)
     return len;
 }
 
-BPLONG Plistn(length)
-    BPLONG length;
+BPLONG Plistn(BPLONG length)
 {
     BPLONG lst, tail, tmp;
 
@@ -254,33 +220,27 @@ BPLONG Plistn(length)
     return lst;
 }
 
-int PcallF(term)
-    BPLONG term;
+int PcallF(BPLONG term)
 {
     return bp_call_term(term);
 }
 
-int PcallX(command)
-    BPLONG command;
+int PcallX(BPLONG command)
 {
     return bp_call_term(command);
 }
 
-int PexecP(cmd)
-    char *cmd;
+int PexecP(char *cmd)
 {
     return bp_call_string(cmd);
 }
 
-int Pexecute(cmd)
-    char *cmd;
+int Pexecute(char *cmd)
 {
     return bp_call_string(cmd);
 }
 
-int PinitP(argc, argv)
-    int argc;
-    char **argv;
+int PinitP(int argc, char **argv)
 {
     return initialize_bprolog(argc, argv);
 }

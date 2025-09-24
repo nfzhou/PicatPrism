@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : clpfd_libs.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
  *   Purpose: Primitives on linear constraints
 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,8 +34,7 @@ extern FILE *curr_out;
 
 #define MAX_NUM_VARS_EQ 551
 /* c+a1*x1+...+an*xn = 0 */
-int nary_interval_consistent_eq(n)
-    register BPLONG n;
+int nary_interval_consistent_eq(BPLONG n)
 {
     register BPLONG_PTR dv_ptr, var_ptr, coe_ptr;
     register BPLONG i, first, last;
@@ -352,8 +351,7 @@ int nary_interval_consistent_eq(n)
 
 #define MAX_NUM_VARS_NOCOE_EQ 6
 /* c+x1+...+xn = 0 */
-int nary_interval_consistent_nocoe(n)
-    register BPLONG n;
+int nary_interval_consistent_nocoe(BPLONG n)
 {
     register BPLONG_PTR dv_ptr, var_ptr;
     register BPLONG i, first, last;
@@ -404,8 +402,7 @@ int nary_interval_consistent_nocoe(n)
    t(i-1) >= l(i)-a(i)*min(x(i)) if a(i) < 0
 */
 #define MAX_NUM_VARS_GE 551
-int nary_interval_consistent_ge(n)
-    register BPLONG n;
+int nary_interval_consistent_ge(BPLONG n)
 {
     register BPLONG_PTR dv_ptr, var_ptr, coe_ptr;
     register BPLONG i, first, last;
@@ -740,8 +737,7 @@ int nary_interval_consistent_ge(n)
 
 /******** region *************/
 /* X must be either a int or a fd variable */
-int varorint_domain_region(X, from, to)
-    BPLONG X, from, to;
+int varorint_domain_region(BPLONG X, BPLONG from, BPLONG to)
 {
     BPLONG_PTR dv_ptr;
 
@@ -756,9 +752,7 @@ int varorint_domain_region(X, from, to)
     }
 }
 
-int domain_region_noint(dv_ptr, from, to)
-    BPLONG_PTR dv_ptr;
-BPLONG from, to;
+int domain_region_noint(BPLONG_PTR dv_ptr, BPLONG from, BPLONG to)
 {
     BPLONG dv_ptr_first, dv_ptr_last, size;
     int k;
@@ -769,9 +763,7 @@ BPLONG from, to;
     return 1;
 }
 
-int domain_region_aux(dv_ptr, from, to)
-    BPLONG_PTR dv_ptr;
-BPLONG from, to;
+int domain_region_aux(BPLONG_PTR dv_ptr, BPLONG from, BPLONG to)
 {
     BPLONG dv_ptr_first, dv_ptr_last, size, val;
     int k;
@@ -787,8 +779,7 @@ BPLONG from, to;
     return 1;
 }
 
-void print_linear_constr(n)
-    BPLONG n;
+void print_linear_constr(BPLONG n)
 {
     BPLONG i;
     BPLONG c = FOLLOW(arreg+2*n+1);
@@ -807,11 +798,10 @@ void print_linear_constr(n)
     fprintf(curr_out, "=0 \n");
 }
 
-int b_CONSTR_COES_TYPE(n)
-    BPLONG n;
+int b_CONSTR_COES_TYPE(BPLONG n)
 {
     BPLONG_PTR dv_ptr, var_ptr, coe_ptr;
-    BPLONG a, c, x, coesType, first, last;
+    BPLONG a, c, x, first, last;
     int property, type, term_lb, term_ub, all_bool_vars, i;
 
     n = INTVAL(n);
@@ -889,8 +879,7 @@ int b_CONSTR_COES_TYPE(n)
     return BP_TRUE;
 }
 
-int b_IS_BOOLEAN_VAR_CONSTR(coes_type)
-    BPLONG coes_type;
+int b_IS_BOOLEAN_VAR_CONSTR(BPLONG coes_type)
 {
     DEREF_NONVAR(coes_type);
     coes_type = INTVAL(coes_type);
@@ -1025,11 +1014,9 @@ int b_BOOL_OR_c(BPLONG n) {
     x1 = FOLLOW(var_ptr); DEREF_NONVAR(x1);
     if (IS_SUSP_VAR(x1)) {
         int num_of_vars = 0;
-        BPLONG last_var;
         for (i = 1; i < n; i++) {
             x = FOLLOW(var_ptr-i); DEREF_NONVAR(x);
             if (IS_SUSP_VAR(x)) {
-                last_var = x;
                 num_of_vars++;
             } else if (x == BP_ONE) {  /* if x=1, then assign x1 to 1 and kill this propagator */
                 dv_ptr = (BPLONG_PTR)UNTAGGED_TOPON_ADDR(x1);
@@ -1100,11 +1087,9 @@ int b_BOOL_AND_c(BPLONG n) {
     x1 = FOLLOW(var_ptr); DEREF_NONVAR(x1);
     if (IS_SUSP_VAR(x1)) {
         int num_of_vars = 0;
-        BPLONG last_var;
         for (i = 1; i < n; i++) {
             x = FOLLOW(var_ptr-i); DEREF_NONVAR(x);
             if (IS_SUSP_VAR(x)) {
-                last_var = x;
                 num_of_vars++;
             } else if (x == BP_ZERO) {  /* if x=0, then assign x1 to 0, and kill this propagator */
                 dv_ptr = (BPLONG_PTR)UNTAGGED_TOPON_ADDR(x1);
@@ -1160,7 +1145,7 @@ int b_BOOL_AND_c(BPLONG n) {
 /* X1 = max(X2, ..., Xn), n<=15, Xi's are in the current frame */
 int b_PROP_MAX_c(BPLONG n) {
     BPLONG_PTR dv_ptr1, dv_ptr, var_ptr;
-    BPLONG x1, x, first1, last1, first, last, num_of_vars, acc_min, acc_max, last_var;
+    BPLONG x1, x, first1, last1, first, last, num_of_vars, acc_min, acc_max;
     int i;
 
     //  printf("=> prop_max\n");

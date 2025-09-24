@@ -1,12 +1,19 @@
 /********************************************************************
  *   File   : table.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
  *   Purpose: Primitives on table area
 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
- ********************************************************************/
+
+Detailed descriptions can be found in:
+
+N.F. Zhou, T. Sato, Y.D. Shen: Linear tabling strategies and optimizations, 2008.
+
+N.F. Zhou & C.T. Have: Efficient Tabling of Structured Data with Enhanced Hash-Consing, 2012. 
+
+********************************************************************/
 #include <stdlib.h>
 #include "basic.h"
 #include "term.h"
@@ -230,6 +237,7 @@ int identicalTabledTerms(BPLONG t1, BPLONG t2) {
 
 beginning:
     if (t1 == t2) return 1;
+    if (TAG(t1) != TAG(t2)) return 0;
     switch(TAG(t1)) {
     case REF:
     case ATM: return 0;
@@ -400,8 +408,9 @@ BPLONG_PTR lookupSubgoalTable(BPLONG_PTR stack_arg_ptr, int arity, SYM_REC_PTR s
     BPLONG_PTR trail_top0, old_table_top;
     BPLONG initial_diff0;
     BPULONG tmp_mode_bits;
-    //    void printSubgoalTableEntry();
+    void printSubgoalTableEntry();
 
+    //    printTable();
     initial_diff0 = (BPULONG)trail_up_addr-(BPULONG)trail_top;
 
     /* before numbering the tabled call */
@@ -434,8 +443,7 @@ BPLONG_PTR lookupSubgoalTable(BPLONG_PTR stack_arg_ptr, int arity, SYM_REC_PTR s
             tmp_mode_bits = tmp_mode_bits >> 1;
         }
     }
-
-    //  printf("lookup "); write_term(*(stack_arg_ptr));        printf("hcode=%x\n",hcode);
+    //    printf("lookup "); write_term(*(stack_arg_ptr));        printf(" hcode=%x\n",hcode);
 
     entryPtrPtr0 = subgoalTable + (hcode % subgoalTableBucketSize);
     entryPtr = (BPLONG_PTR)FOLLOW(entryPtrPtr0);
@@ -1083,19 +1091,6 @@ void complete_scc_elms(BPLONG_PTR subgoal_entry) {
     }
 }
 
-void reset_temp_complete_scc_elms(BPLONG_PTR subgoal_entry) {
-    BPLONG_PTR ptr, entry, tmp_ptr;
-
-    ptr = (BPLONG_PTR)GT_SCC_ELMS(subgoal_entry);
-    while (ptr != NULL) {
-        entry = (BPLONG_PTR)FOLLOW(ptr);
-        if (entry != NULL && GT_TOP_AR(entry) == SUBGOAL_TEMP_COMPLETE) {
-            GT_TOP_AR(entry) = (BPLONG)NULL;
-        }
-        ptr = (BPLONG_PTR)FOLLOW(ptr+1);
-    }
-}
-
 /********************** ANSWER TABLE *********************/
 BPLONG_PTR addFirstTableAnswer(BPLONG_PTR stack_arg_ptr, int arity) {
     BPLONG_PTR answer;
@@ -1158,7 +1153,8 @@ BPLONG_PTR allocateAnswerTable(BPLONG_PTR first_answer, int arity) {
 
 int addTableAnswer(BPLONG_PTR stack_arg_ptr, int arity, BPLONG_PTR subgoal_entry) {
     BPLONG_PTR answer_table, this_answer, answer, last_answer, bucket_ptr, this_table_arg_ptr, table_arg_ptr, entryPtr;
-    BPLONG_PTR trail_top0, old_table_top;
+    // BPLONG_PTR trail_top0;
+    BPLONG_PTR old_table_top;
     BPLONG i, answer_record_size, bucket_size, hcode;
 
     answer_table = (BPLONG_PTR)GT_ANSWER_TABLE(subgoal_entry);
@@ -1314,8 +1310,8 @@ int addTableOptimalAnswer(BPLONG_PTR stack_arg_ptr, int arity, BPLONG_PTR subgoa
     /* now add the new answer if the cardinality limit allows */
     last_answer = (BPLONG_PTR)ANSWERTABLE_LAST(answer_table);
     if (table_card == ANSWERTABLE_COUNT(answer_table)) {  /* replace */
-        if (maximize == 0 && isSmallerTabledAnswer(this_answer, last_answer, opt_arg_index) ||
-            maximize == 1 && isBiggerTabledAnswer(this_answer, last_answer, opt_arg_index)) {
+        if ((maximize == 0 && isSmallerTabledAnswer(this_answer, last_answer, opt_arg_index)) ||
+            (maximize == 1 && isBiggerTabledAnswer(this_answer, last_answer, opt_arg_index))) {
             removeAnswerFromAnswerTable(answer_table, last_answer, arity);
             copyTabledAnswerArgs(this_answer, last_answer, arity);
             if (ta_record_ptr->top == old_table_top+answer_record_size) {  /* reuse the last answer, so deallocate the space */
@@ -1521,7 +1517,6 @@ int c_VARIANT() {
 
 int b_VARIANT_cc(BPLONG op1, BPLONG op2) {
     int i;
-    BPLONG maxVarNo;
     BPLONG_PTR trail_top0;
     BPLONG initial_diff0;
 
@@ -1529,8 +1524,6 @@ int b_VARIANT_cc(BPLONG op1, BPLONG op2) {
 
     if (TAG(op1) == ATM || TAG(op2) == ATM)
         return op1 == op2;
-
-    maxVarNo = -1;
 
     initial_diff0 = (BPULONG)trail_up_addr-(BPULONG)trail_top;
 
@@ -1551,7 +1544,7 @@ int b_VARIANT_cc(BPLONG op1, BPLONG op2) {
   t2 is a numbered term, which needs to be dereferenced
 */
 int term_subsume_numberedterm(BPLONG t1, BPLONG t2) {
-    BPLONG_PTR top, ptr;
+    BPLONG_PTR top;
     BPLONG i, arity;
 
 beginning:
@@ -1853,7 +1846,7 @@ int c_set_all_table_cardinality_limit() {
     card = ARG(1, 1); DEREF(card); card = INTVAL(card);
 
     for (i = 0; i < BUCKET_CHAIN; ++i) {
-        sym_ptr = hash_table[i];
+        sym_ptr = sym_hash_table[i];
         while (sym_ptr != NULL) {
             if (GET_ETYPE(sym_ptr) == T_PRED) {
                 ep = (BPLONG_PTR)GET_EP(sym_ptr);
@@ -1868,11 +1861,9 @@ int c_set_all_table_cardinality_limit() {
 }
 
 int table_statistics() {
-    BPLONG i, count, subgoal_count, total_ans_count, max_ans_count, zero_ans_count, total_ans_access_count, max_ans_access_count, total_its_count, max_its_count, scc_nodes_count;
+    BPLONG i, count, subgoal_count, total_ans_count, max_ans_count, zero_ans_count, total_its_count, max_its_count, scc_nodes_count;
     BPLONG_PTR subgoal_entry, ptr;
     subgoal_count = 0;
-    total_ans_access_count = 0;
-    max_ans_access_count = 0;
     total_its_count = 0;
     max_its_count = 0;
     total_ans_count = 0;
@@ -1974,143 +1965,6 @@ int c_TA_TOP_f() {
     return BP_TRUE;
 }
 
-void reset_temp_complete_subgoal_entries() {
-    BPLONG i;
-    BPLONG_PTR subgoal_entry, ptr;
-
-    for (i = 0; i < subgoalTableBucketSize; i++) {
-        subgoal_entry = (BPLONG_PTR)FOLLOW(subgoalTable+i);
-        while (subgoal_entry != NULL) {
-            if (GT_TOP_AR(subgoal_entry) == SUBGOAL_TEMP_COMPLETE) {
-                printf("TEMP_COMPLETE " BPULONG_FMT_STR "\n", subgoal_entry);
-                ptr = (BPLONG_PTR)GT_SCC_ROOT(subgoal_entry);
-                printf("SCC_ROOT = " BPULONG_FMT_STR "\n", ptr);
-                printf("SCC_ROOT = " BPULONG_FMT_STR "\n", GT_TOP_AR(ptr));
-            }
-            //                GT_TOP_AR(subgoal_entry) = (BPLONG)NULL;
-            subgoal_entry = (BPLONG_PTR)GT_NEXT(subgoal_entry);
-        }
-    }
-}
-
-/*
-  void printTable(){
-  void printSubgoalTableEntry(BPLONG_PTR);
-  
-  BPLONG i,count,subgoal_count,total_ans_count,max_ans_count,zero_ans_count,total_ans_access_count,max_ans_access_count,total_its_count,max_its_count,scc_nodes_count;
-  BPLONG_PTR subgoal_entry,ptr;
-  subgoal_count = 0;
-  total_ans_access_count=0;
-  max_ans_access_count=0;
-  total_its_count=0;
-  max_its_count=0;
-  total_ans_count=0;
-  max_ans_count=0;
-  zero_ans_count=0;
-  scc_nodes_count = 0;
-  
-  for (i=0;i<subgoalTableBucketSize;i++){
-  subgoal_entry = (BPLONG_PTR)FOLLOW(subgoalTable+i);
-  while (subgoal_entry != NULL) {
-  printSubgoalTableEntry(subgoal_entry);
-  subgoal_entry = (BPLONG_PTR)GT_NEXT(subgoal_entry);
-  }
-  }
-  }
-
-  void printSubgoalTableEntry(ptr)
-  BPLONG_PTR ptr;
-  {
-  BPLONG arity;
-  BPLONG_PTR answer,answerTable;
-  SYM_REC_PTR sym_ptr;
-  void printAnswer();
-
-  sym_ptr = (SYM_REC_PTR)GT_SYM(ptr);
-  arity = GET_ARITY(sym_ptr);
-
-  
-  fprintf(curr_out,"%x %s(",ptr, GET_NAME(sym_ptr));
-  //  printAnswer(GT_ARG_ADDR(ptr),arity);
-  fprintf(curr_out,"(%x)\n",GT_TOP_AR(ptr));
-  answerTable = (BPLONG_PTR)GT_ANSWER_TABLE(ptr);
-  if (answerTable==NULL) return;
-  answer = (BPLONG_PTR)ANSWERTABLE_FIRST(answerTable);
-  fprintf(curr_out,"OLD\n");
-  answer = (BPLONG_PTR)ANSWER_NEXT_IN_TABLE(answer);
-  while (answer!=NULL){
-  fprintf(curr_out,"%x     (",answer);printAnswer(ANSWER_ARG_ADDR(answer),arity);
-  answer = (BPLONG_PTR)ANSWER_NEXT_IN_TABLE(answer); 
-  }
-  }
-
-  void printAnswer(ptr,arity)
-  BPLONG_PTR ptr;
-  BPLONG arity;
-  {
-  BPLONG i;
-  BPLONG term;
-  void myWriteTerm();
-
-  for (i=0;i<arity;i++){
-  term = FOLLOW(ptr+i);
-  myWriteTerm(term);
-  if (i!=arity-1) fprintf(curr_out,",");
-  }
-  fprintf(curr_out,"). ");
-  }
-
-  void myWriteTerm(term)
-  BPLONG term;
-  {
-  BPLONG_PTR top;
-  DEREF(term);
-
-  if (ISREF(term)) fprintf(curr_out,"_%x",term); 
-  else if (TAG(term)==ATM) write_term(term);
-  else if (TAG(term)==LST) {
-  if (IsNumberedVar(term)) fprintf(curr_out,"n%x ",term);
-  else {
-  fprintf(curr_out,"[");
-  myWriteList(term);
-  fprintf(curr_out,"]");
-  }
-  } else {
-  SYM_REC_PTR sym_ptr;
-  BPLONG arity,i;
-  UNTAG_ADDR(term);
-  sym_ptr = (SYM_REC_PTR)FOLLOW(term);
-  bp_write_pname(GET_NAME(sym_ptr));
-  if (GET_ARITY(sym_ptr)>0) {
-  fprintf(curr_out,"(");
-  arity = GET_ARITY(sym_ptr);
-  for (i=1;i<=arity;i++) {
-  myWriteTerm(*((BPLONG_PTR)term+i));
-  if (i<arity)
-  fprintf(curr_out,",");
-  }
-  fprintf(curr_out,")");
-  }
-  }
-  }
-
-  void myWriteList(term)
-  BPLONG term;
-  {
-  BPLONG car,cdr;
-  BPLONG_PTR top;
-
-  UNTAG_ADDR(term);
-  car = FOLLOW((BPLONG_PTR)term);
-  cdr = FOLLOW((BPLONG_PTR)term+1);DEREF(cdr);
-  myWriteTerm(car);
-  if (ISLIST(cdr)){
-  fprintf(curr_out,",");
-  myWriteList(cdr);
-  }
-  }
-
-*/
 
 /*  defined in basic.h, also see global_maps in assert.c
 
@@ -2240,7 +2094,7 @@ void expand_picat_table_map(MAP_RECORD_PTR mr_ptr) {
 }
 
 int b_PICAT_TABLE_MAP_PUT_ccc(BPLONG map_num, BPLONG key, BPLONG val) {
-    BPLONG i, key_cp, val_cp, this_hcode, this_ground_flag, dummy_hcode, dummy_ground_flag;
+    BPLONG key_cp, val_cp, this_hcode, this_ground_flag, dummy_hcode, dummy_ground_flag;
     BPLONG_PTR trail_top0, tmp_ptr, kvp_ptr_ptr;
     MAP_RECORD_PTR mr_ptr;
     KEY_VAL_PAIR_PTR kvp_ptr;
@@ -2324,6 +2178,44 @@ int b_PICAT_TABLE_MAP_GET_ccf(BPLONG map_num, BPLONG key, BPLONG val) {
         }
     }
     return BP_FALSE;
+}
+
+int c_PICAT_TABLE_MAP_DEL_cc(){
+    BPLONG map_num;
+    BPLONG key;
+    BPLONG this_hcode;
+    BPLONG_PTR kvp_ptr_ptr;
+    MAP_RECORD_PTR mr_ptr;
+    KEY_VAL_PAIR_PTR kvp_ptr;
+
+    map_num = ARG(1,2);
+    key = ARG(2,2);    
+    DEREF(key);
+    if (ISREF(key)) {
+        bp_exception = nonvariable_expected;
+        return BP_ERROR;
+    }
+
+    DEREF_NONVAR(map_num);
+    map_num = INTVAL(map_num);
+    mr_ptr = (MAP_RECORD_PTR)picat_table_maps[map_num];
+
+    this_hcode = bp_hashval(key);
+
+    kvp_ptr_ptr = (BPLONG_PTR)(mr_ptr->htable + (this_hcode % mr_ptr->size));
+    kvp_ptr = (KEY_VAL_PAIR_PTR)FOLLOW(kvp_ptr_ptr);
+
+    while (kvp_ptr != NULL) {  /* lookup */
+        if (kvp_ptr->key != key && !key_identical(kvp_ptr->key, key)) {
+            kvp_ptr_ptr = (BPLONG_PTR)&(kvp_ptr->next);
+            kvp_ptr = (KEY_VAL_PAIR_PTR)kvp_ptr->next;
+        } else {
+            *(BPLONG_PTR)kvp_ptr_ptr = (BPLONG)(kvp_ptr->next);
+            mr_ptr->count = mr_ptr->count-1;
+            return BP_TRUE;          
+        }
+    }
+    return BP_TRUE;
 }
 
 int b_PICAT_TABLE_MAP_SIZE_cf(BPLONG map_num, BPLONG size) {
@@ -2444,3 +2336,131 @@ int b_PICAT_TABLE_MAP_LIST_cf(BPLONG map_num, BPLONG pairs) {
     }
     return unify(lst, pairs);
 }
+/*
+  void myWriteTerm();
+  void myWriteList();
+
+  void printTable(){
+  void printSubgoalTableEntry(BPLONG_PTR);
+  
+  BPLONG i,count,subgoal_count,total_ans_count,max_ans_count,zero_ans_count,total_ans_access_count,max_ans_access_count,total_its_count,max_its_count,scc_nodes_count;
+  BPLONG_PTR subgoal_entry,ptr;
+  subgoal_count = 0;
+  total_ans_access_count=0;
+  max_ans_access_count=0;
+  total_its_count=0;
+  max_its_count=0;
+  total_ans_count=0;
+  max_ans_count=0;
+  zero_ans_count=0;
+  scc_nodes_count = 0;
+  
+  for (i=0;i<subgoalTableBucketSize;i++){
+  subgoal_entry = (BPLONG_PTR)FOLLOW(subgoalTable+i);
+  while (subgoal_entry != NULL) {
+  printSubgoalTableEntry(subgoal_entry);
+  subgoal_entry = (BPLONG_PTR)GT_NEXT(subgoal_entry);
+  }
+  }
+  }
+
+  void printSubgoalTableEntry(ptr)
+  BPLONG_PTR ptr;
+  {
+  BPLONG arity;
+  BPLONG_PTR answer,answerTable;
+  SYM_REC_PTR sym_ptr;
+  void printAnswer();
+
+  sym_ptr = (SYM_REC_PTR)GT_SYM(ptr);
+  arity = GET_ARITY(sym_ptr);
+
+  
+  fprintf(curr_out,"%x %s(",ptr, GET_NAME(sym_ptr));
+  printAnswer(GT_ARG_ADDR(ptr),arity);
+  fprintf(curr_out,"(%x)\n",GT_TOP_AR(ptr));
+
+  answerTable = (BPLONG_PTR)GT_ANSWER_TABLE(ptr);
+  if (answerTable==NULL) return;
+  if ((BPLONG)answerTable & 0x1) {  
+  answer = UNTAGGED_ADDR((BPLONG)answerTable);
+  fprintf(curr_out,"%x     (",answer);printAnswer(ANSWER_ARG_ADDR(answer),arity);
+  } else {
+  answer = (BPLONG_PTR)ANSWERTABLE_FIRST(answerTable);
+  fprintf(curr_out,"OLD\n");
+  answer = (BPLONG_PTR)ANSWER_NEXT_IN_TABLE(answer);
+  while (answer!=NULL){
+  fprintf(curr_out,"%x     (",answer);printAnswer(ANSWER_ARG_ADDR(answer),arity);
+  answer = (BPLONG_PTR)ANSWER_NEXT_IN_TABLE(answer); 
+  }
+  }
+
+  }
+
+  void printAnswer(ptr,arity)
+  BPLONG_PTR ptr;
+  BPLONG arity;
+  {
+  BPLONG i;
+  BPLONG term;
+
+  for (i=0;i<arity;i++){
+  term = FOLLOW(ptr+i);
+  myWriteTerm(term);
+  if (i!=arity-1) fprintf(curr_out,",");
+  }
+  fprintf(curr_out,"). ");
+  }
+
+  void myWriteTerm(term)
+  BPLONG term;
+  {
+  BPLONG_PTR top;
+  DEREF(term);
+
+  if (ISREF(term)) fprintf(curr_out,"_%x",term); 
+  else if (TAG(term)==ATM) write_term(term);
+  else if (TAG(term)==LST) {
+  if (IsNumberedVar(term)) fprintf(curr_out,"n%x ",term);
+  else {
+  fprintf(curr_out,"[");
+  myWriteList(term);
+  fprintf(curr_out,"]");
+  }
+  } else {
+  SYM_REC_PTR sym_ptr;
+  BPLONG arity,i;
+  UNTAG_ADDR(term);
+  sym_ptr = (SYM_REC_PTR)FOLLOW(term);
+  bp_write_pname(GET_NAME(sym_ptr));
+  if (GET_ARITY(sym_ptr)>0) {
+  fprintf(curr_out,"(");
+  arity = GET_ARITY(sym_ptr);
+  for (i=1;i<=arity;i++) {
+  myWriteTerm(*((BPLONG_PTR)term+i));
+  if (i<arity)
+  fprintf(curr_out,",");
+  }
+  fprintf(curr_out,")");
+  }
+  }
+  }
+
+  void myWriteList(term)
+  BPLONG term;
+  {
+  BPLONG car,cdr;
+  BPLONG_PTR top;
+
+  UNTAG_ADDR(term);
+  car = FOLLOW((BPLONG_PTR)term);
+  cdr = FOLLOW((BPLONG_PTR)term+1);DEREF(cdr);
+  myWriteTerm(car);
+  if (ISLIST(cdr)){
+  fprintf(curr_out,",");
+  myWriteList(cdr);
+  }
+  }
+
+
+*/

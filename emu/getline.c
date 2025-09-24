@@ -752,7 +752,7 @@ gl_redraw()
 static void
 gl_fixup(prompt, change, cursor)
     char *prompt;
-int change, cursor;
+    int change, cursor;
 /*
  * This function is used both for redrawing when input changes or for
  * moving within the input line.  The parameters are:

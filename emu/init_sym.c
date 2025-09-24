@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : init_sym.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -41,7 +41,9 @@ void init_sym() {
     call_cleanup_psc = BP_NEW_SYM("_$call_cleanup_call", 0);
     float_psc = insert_sym("$float", 6, 3);
     bigint_psc = insert_sym("$bigint", 7, 2);
-
+#ifdef XCSP_PICAT
+    xcsp_vx_psc = insert_sym("_$xcsp_vx", 9, 1);
+#endif  
     address_psc = insert_sym("$address", 8, 2);  //branch
     socket_psc = insert_sym("$socket", 7, 1);  //branch
     stream_psc = insert_sym("$stream", 7, 1);  //branch
@@ -199,6 +201,7 @@ void init_error_sym() {
     et_NON_EMPTY_LIST = ADDTAG(BP_NEW_SYM("non_empty_list", 0), ATM);
     et_NOT_LESS_THAN_ZERO = ADDTAG(BP_NEW_SYM("not_less_than_zero", 0), ATM);
     et_NUMBER = ADDTAG(BP_NEW_SYM("number", 0), ATM);
+    et_NEGATION = ADDTAG(BP_NEW_SYM("negation", 0), ATM);
     et_OPEN = ADDTAG(BP_NEW_SYM("open", 0), ATM);
     et_OPERATOR = ADDTAG(BP_NEW_SYM("operator", 0), ATM);
     et_OPERATOR_PRIORITY = ADDTAG(BP_NEW_SYM("operator_priority", 0), ATM);
@@ -251,7 +254,7 @@ void init_error_sym() {
 void init_char_sym() {
     int i;
     char c;
-    for (i = 1; i < AlphabetSize; i++) {
+    for (i = 0; i < AlphabetSize; i++) {
         c = (char)i;
         char_sym_table[i] = ADDTAG(insert_sym(&c, 1, 0), ATM);
     }

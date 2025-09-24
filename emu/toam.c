@@ -1,12 +1,18 @@
 /********************************************************************
  *   File   : toam.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
  *   Purpose: Emulator of ATOAM
 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
- ********************************************************************/
+
+Detailed descriptions can be found in:
+
+N.F. Zhou: Parameter Passing and Control Stack Management in Prolog Implementation Revisited, 1996.
+
+N.F. Zhou: The language features and architecture of B-Prolog, 2012.
+********************************************************************/
 
 #include <stdlib.h>
 #include "basicd.h"
@@ -45,13 +51,16 @@ BPLONG table_allocate_code = table_allocate;
 void **jmp_table;
 #endif
 
-void exception_handler(signo)
-    int signo;
+void exception_handler(int signo)
 {
     switch (signo) {
 #ifdef BPSOLVER
+#ifdef WIN32
+    case SIGSEGV:
+#else
     case SIGXCPU:
     case SIGSEGV:
+#endif
         fprintf(stderr, "%% unhandled signal %d\n", signo);
         //    fprintf(stdout,"%% UNKNOWN\n");
         exit(1);
@@ -90,16 +99,19 @@ void init_signals() {
     if (signal(SIGINT, exception_handler) == SIG_ERR)
         printf("can't catch SIGINT\n");
 #ifdef BPSOLVER
+#ifdef WIN32
+    if (signal(SIGSEGV, exception_handler) == SIG_ERR)
+        printf("can't catch SIGINT\n");
+#else    
     if (signal(SIGXCPU, exception_handler) == SIG_ERR)
         printf("can't catch SIGINT\n");
     if (signal(SIGSEGV, exception_handler) == SIG_ERR)
         printf("can't catch SIGINT\n");
 #endif
+#endif
 }
 
-int initialize_bprolog(argc, argv)
-    int argc;
-    char *argv[];
+int initialize_bprolog(int argc, char *argv[])
 {
     BPLONG_PTR inst_begin0;
     if (bprolog_initialized == 1) return BP_TRUE;
@@ -127,8 +139,7 @@ int initialize_bprolog(argc, argv)
     return BP_TRUE;
 }
 
-int toam(P, AR, LOCAL_TOP)
-    register BPLONG_PTR P, AR, LOCAL_TOP;
+int toam(BPLONG_PTR P, BPLONG_PTR AR, BPLONG_PTR LOCAL_TOP)
 {
     register BPLONG op1;
     register BPLONG_PTR top, sreg = NULL;
@@ -136,7 +147,6 @@ int toam(P, AR, LOCAL_TOP)
     register SYM_REC_PTR sym_ptr = NULL;
     register BPLONG arity, i;
     register BPLONG_PTR dv_ptr;
-    BYTE table_flag;
     BPLONG_PTR ep;
 
     BPLONG head_arity;
@@ -230,7 +240,7 @@ interrupt_handler: {
             (*user_signal_action[user_signal])(user_signal, user_signal_data[user_signal]);
         }
         while ((BPLONG)f != AR_B(f)) {
-            RESET_SUBGOAL_AR(f);
+            RESET_TABLED_SUBGOAL_AR(f);
             if (IS_CATCHER_FRAME(f)) {
                 btm_ptr = (BPLONG_PTR)UNTAGGED_ADDR(AR_BTM(f));  /* a catcher frame is in the form of p(Flag,Cleanup,Calll,Exception,Recovery,...) */
                 this_exception = FOLLOW(btm_ptr-3);

@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : basicd.h
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2022
 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -87,7 +87,9 @@ int in_critical_region = 0;
 BPLONG fd_region_low;
 BPLONG fd_region_up;
 
-SYM_REC_PTR hash_table[BUCKET_CHAIN];
+SYM_REC_PTR sym_hash_table[BUCKET_CHAIN];
+// MODULE_SYM_REC_PTR module_sym_hash_table[MODULE_BUCKET_CHAIN];
+
 BPLONG char_sym_table[AlphabetSize];
 BPLONG number_of_symbols = 0;
 BPLONG curr_line_no = 1 ;
@@ -103,6 +105,7 @@ BPLONG_PTR global_unnumbervar_ptr;
 BPLONG_PTR global_unnumbervar_watermark;
 
 BPLONG bp_exception;
+BPLONG bp_stacktrace_lst;
 BPLONG foreign_exception = (BPLONG) NULL;
 SYM_REC_PTR list_psc;
 SYM_REC_PTR equal_psc;
@@ -126,6 +129,9 @@ SYM_REC_PTR address_psc;
 SYM_REC_PTR socket_psc;
 SYM_REC_PTR stream_psc;
 SYM_REC_PTR bigint_psc;
+#ifdef XCSP_PICAT
+SYM_REC_PTR xcsp_vx_psc;
+#endif
 SYM_REC_PTR timer_psc;
 SYM_REC_PTR enter_dyn_call;
 SYM_REC_PTR enter_catch_call;
@@ -291,6 +297,7 @@ et_OUT_OF_MEMORY,
     et_NON_EMPTY_LIST,
     et_NOT_LESS_THAN_ZERO,
     et_NUMBER,
+    et_NEGATION,  
     et_OPEN,
     et_OPERATOR,
     et_OPERATOR_PRIORITY,

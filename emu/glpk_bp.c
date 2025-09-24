@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : sat_bp.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
  *   Purpose: interface between B-Prolog and GLPK
 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -53,7 +53,7 @@ extern double floatval();
     }
 
 int glpk_error(error_msg)
-    char *error_msg;
+char *error_msg;
 {
     fprintf(stderr, "GLPK ERROR: %s\n ", error_msg);
     return BP_FALSE;

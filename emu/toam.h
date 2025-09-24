@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : toam.h
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2022
 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,9 +15,6 @@
 /*
   #define ToamProfile 
 */
-extern BPLONG_PTR expand_trail();
-extern BPLONG next_alive_susp_call();
-
 void (*user_signal_action[NSIG])(int, void *);
 void *user_signal_data[NSIG];
 
@@ -727,7 +724,7 @@ extern BPLONG no_gcs;
         RESTORE_AR; RESTORE_TOP;                                \
         EXPAND_STACK(LARGE_MARGIN);                             \
     }                                                           \
-        toam_LOCAL_OVERFLOW_CHECK(7);                           \
+    toam_LOCAL_OVERFLOW_CHECK(7);                               \
 
 /*
   #define INVOKE_GC INVOKE_GC_UNCOND 
@@ -812,15 +809,18 @@ extern BPLONG no_gcs;
         }                                                               \
     }
 
-#define RESET_SUBGOAL_AR(f) {                                           \
+#define RESET_TABLED_SUBGOAL_AR(f) {                                    \
         if (IS_TABLE_FRAME(f)) {                                        \
             BPLONG_PTR subgoal_entry = (BPLONG_PTR)GET_AR_SUBGOAL_TABLE(f); \
             if (subgoal_entry != NULL && GT_TOP_AR(subgoal_entry) != SUBGOAL_COMPLETE) { \
-                reset_temp_complete_scc_elms(subgoal_entry);            \
                 GT_TOP_AR(subgoal_entry) = (BPLONG)NULL;                \
+                GT_SCC_ROOT(subgoal_entry) = (BPLONG)subgoal_entry;     \
+                GT_SCC_ELMS(subgoal_entry) = (BPLONG)NULL;              \
+                SUBGOAL_START_NORMAL(subgoal_entry);                    \
             }                                                           \
         }                                                               \
     }
+
 
 
 

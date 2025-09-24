@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : bapi.h
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2022
 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -133,9 +133,6 @@
 #define ASSIGN_TRAIL_VALUE(var, value)          \
     *(BPLONG_PTR)var = (BPLONG)(value);         \
     PUSHTRAILC(var, var)
-
-#define ASSIGN(var, value)                      \
-    *(BPLONG_PTR)var = value
 
 #define LOCAL_OVERFLOW_CHECK(src)               \
     if (local_top - heap_top <= LARGE_MARGIN) { \

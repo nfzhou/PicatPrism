@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : builtins.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
  *   Purpose: Inline built-ins
 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -144,6 +144,9 @@ void init_builtins(void) {
     INITIALIZE_BUILTIN2(126, b_IS_CALLABLE_c);
     INITIALIZE_BUILTIN3(127, b_INSERT_ORDERED_NO_DUP_ccf);
     INITIALIZE_BUILTIN3(128, b_INSERT_ORDERED_DOWN_NO_DUP_ccf);
+    INITIALIZE_BUILTIN3(129, b_PICAT_PRINT_PRIMITIVE_cc);
+    INITIALIZE_BUILTIN3(130, b_PICAT_WRITE_PRIMITIVE_cc);
+        
     /* for threads */
     /*
       INITIALIZE_BUILTIN1(127,b_IS_LATEST_CHOICE_POINT_c);
@@ -338,8 +341,10 @@ void init_builtins(void) {
     INITIALIZE_BUILTIN2(312, b_PICAT_GLOBAL_MAP_VALS_cf);
     INITIALIZE_BUILTIN2(313, b_PICAT_GLOBAL_MAP_LIST_cf);
     INITIALIZE_BUILTIN1(314, b_PLANNER_UPDATE_EXPLORED_DEPTH_c);
+#ifdef SAT    
     INITIALIZE_BUILTIN3(315, b_SAT_RETRIEVE_BNUM_cff);
     INITIALIZE_BUILTIN1(316, b_SAT_GET_INC_VAR_NUM_f);
+#endif    
 }
 
 /*
@@ -372,8 +377,7 @@ static char *arch_string = "unix";
 #endif
 
 //branch b_GET_ARCH_f(arch)
-int b_GET_ARCH_f(arch)
-    BPLONG arch;
+int b_GET_ARCH_f(BPLONG arch)
 {
     SYM_REC_PTR sym_ptr;
 

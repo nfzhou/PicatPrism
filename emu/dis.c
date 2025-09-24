@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : dis.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -41,7 +41,7 @@ void dis_data()
     printf("==> dis_data\n");
 
     for (i = 0; i < BUCKET_CHAIN; ++i) {
-        psc_ptr = hash_table[i];
+        psc_ptr = sym_hash_table[i];
         while (psc_ptr != NULL) {
             fprintf(filedes, BPLONG_FMT_STR ": ", (BPLONG)psc_ptr);
             curr_out = filedes;
@@ -70,7 +70,7 @@ void dis_data()
   *len_of_longest_chain = 0;
   
   for (i = 0; i < BUCKET_CHAIN; ++i) {
-  psc_ptr = hash_table[i];
+  psc_ptr = sym_hash_table[i];
   count = 0;
   while (psc_ptr!=NULL) {
   psc_ptr = GET_NEXT(psc_ptr);
@@ -98,15 +98,14 @@ void dis_text()
     } while ((cpreg = (BPLONG_PTR)*cpreg));
 }
 
-void print_inst(filedes)
-    FILE *filedes;
+void print_inst(FILE* filedes)
 {
 
     BPLONG opcode;
     BPLONG i, n;
     SYM_REC_PTR sym_ptr;
-	//    if (num_line)
-	fprintf(filedes, BPULONG_FMT_STR "\t", (BPULONG) cpreg);
+    //    if (num_line)
+    fprintf(filedes, BPULONG_FMT_STR "\t", (BPULONG) cpreg);
     opcode = *cpreg++;
 
     //  printf("dis %s\n",inst_name[opcode]);
@@ -125,23 +124,17 @@ void print_inst(filedes)
     }
 }  /* end of print_inst */
 
-void dis_addr(filedes, operand)
-    FILE *filedes;
-    BPLONG operand;
+void dis_addr(FILE *filedes, BPLONG operand)
 {
     fprintf(filedes, "' " BPLONG_FMT_STR "'", (operand));
 }
 
-void dis_y(filedes, operand)
-    FILE *filedes;
-    BPLONG operand;
+void dis_y(FILE *filedes, BPLONG operand)
 {
     fprintf(filedes, " %d", (int)operand);
 }
 
-void dis_constant(filedes, operand)
-    FILE *filedes;
-    BPLONG operand;
+void dis_constant(FILE *filedes, BPLONG operand)
 {
     SYM_REC_PTR sym_ptr;
     if (ISINT(operand)) fprintf(filedes, "c(%d)", (int)INTVAL(operand));
@@ -151,16 +144,12 @@ void dis_constant(filedes, operand)
     }
 }
 
-void dis_literal(filedes, operand)
-    FILE *filedes;
-    BPLONG operand;
+void dis_literal(FILE *filedes, BPLONG operand)
 {
     fprintf(filedes, " %d", (int)operand);
 }
 
-void dis_z(filedes, operand)
-    FILE *filedes;
-    BPLONG operand;
+void dis_z(FILE *filedes, BPLONG operand)
 {
     if (TAG(operand) == ATM) {
         dis_constant(filedes, operand);
@@ -174,17 +163,13 @@ void dis_z(filedes, operand)
     }
 }
 
-void dis_struct(filedes, operand)
-    FILE *filedes;
-    BPLONG operand;
+void dis_struct(FILE *filedes, BPLONG operand)
 {
     SYM_REC_PTR sym_ptr = (SYM_REC_PTR)operand;
     fprintf(filedes, "'%s'/%d", GET_NAME(sym_ptr), GET_ARITY(sym_ptr));
 }
 
-void dis_ys(filedes, n)
-    FILE *filedes;
-    BPLONG n;
+void dis_ys(FILE *filedes, BPLONG n)
 {
     while (n > 0) {
         dis_y(filedes, *cpreg++);
@@ -193,9 +178,7 @@ void dis_ys(filedes, n)
     }
 }
 
-void dis_zs(filedes, n)
-    FILE *filedes;
-    BPLONG n;
+void dis_zs(FILE *filedes, BPLONG n)
 {
     while (n > 0) {
         dis_z(filedes, *cpreg++);

@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : float.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
  *   Purpose: arithmetic functions 
 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,8 +16,7 @@
 /* converts floats from WAM representation to
  *  the machine representation 
  */
-double floatval(op)
-    BPLONG op;
+double floatval(BPLONG op)
 {
     double f;
     UW32 w1, w2, w3, *pw;
@@ -43,8 +42,7 @@ double floatval(op)
  *             to the WAM representation.
  *  '$float'(int1,int2,int2);
  */
-BPLONG encodefloat1(op)
-    double op;
+BPLONG encodefloat1(double op)
 {
     BPLONG temp;
     UW32 *pw, w1, w2;

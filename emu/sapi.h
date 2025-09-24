@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : sapi.h
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2022
 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -26,10 +26,10 @@ int SP_errno;
 
 #define SP_pred_ref BP_pred_ref
 
-extern SP_pred_ref SP_predicate();
-extern SP_pred_ref SP_pred();
+extern SP_pred_ref SP_predicate(char *name_string, long arity, char *module_string);
+extern SP_pred_ref SP_pred(BPULONG name_atom, long arity, BPULONG module_atom);
 extern SP_term_ref SP_new_term_ref();
-extern char *SP_string_from_atom();
+extern char *SP_string_from_atom(BPULONG a);
 extern char *SP_alloc();
 
 

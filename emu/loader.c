@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : loader.c
- *   Author : Updated by Neng-Fa ZHOU 1994-2021
+ *   Author : Updated by Neng-Fa ZHOU 1994-2025
 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -80,7 +80,7 @@ void IGUR(int i);  /* see https://stackoverflow.com/a/16245669/490291 */
     }
 
 #define CHECK_PCODE(ptr, size)                                          \
-    if ((CHAR_PTR)ptr + 1000 + size >= (CHAR_PTR)parea_water_mark) {    \
+    if ((CHAR_PTR)ptr + 1000 + size >= (CHAR_PTR)parea_up_addr) {       \
         myquit(PAREA_OVERFLOW, "ld");                                   \
     }
 
@@ -263,10 +263,7 @@ int load_bytecode_header() {
     return BP_TRUE;
 }
 
-int loader(file, file_type, load_damon)
-    CHAR_PTR file;
-    BPLONG file_type;
-    BPLONG load_damon;
+int loader(CHAR_PTR file, BPLONG file_type, BPLONG load_damon)
 {
     BPLONG err_msg;
     BPLONG total_size;
@@ -281,13 +278,16 @@ int loader(file, file_type, load_damon)
         printf("file %s not exist\n", file);
         return 1;
     }
-    /* printf("\n     ...... loading file %s curr_fence=%x\n", file,curr_fence); */
+    // printf("\n     ...... loading file %s curr_fence=%x\n", file,curr_fence); 
 
     while ((eof_flag = READ_DATA(&magic, 1)) == 0) {
         if (load_bytecode_header() == BP_ERROR)
             return 1;
 
-        total_size = sizeof(BPLONG)*text_bytes + index_bytes + psc_bytes + 1000;
+        //              printf("text_bytes = %lx, index_bytes = %lx psc_bytes = %lx\n", text_bytes, index_bytes, psc_bytes);
+                
+        total_size = sizeof(BPLONG)*(text_bytes + index_bytes + psc_bytes) + 10000;
+        //              printf("total_size = %lx water_mark = %lx\n", (CHAR_PTR)curr_fence+total_size, parea_water_mark);
         if ((CHAR_PTR)curr_fence+total_size > (CHAR_PTR)parea_water_mark) {
             int success = 0;
             if (total_size > parea_size) parea_size = total_size;
@@ -337,8 +337,7 @@ int loader(file, file_type, load_damon)
 }  /* end of loader */
 
 /*************************************************************************/
-int load_syms(file_type)
-    BPLONG file_type;
+int load_syms(BPLONG file_type)
 {
     CHAR name[256];
     BPLONG ep_offset;
@@ -347,7 +346,7 @@ int load_syms(file_type)
     BYTE temp_len;
     BYTE temp_arity;
 
-    /*   printf("=> load_syms \n"); */
+    //  printf("=> load_syms \n"); 
     while (count < psc_bytes && eof_flag == 0) {
         if ((eof_flag = READ_DATA(buf_for_read, 1)))
             return 2;
@@ -369,7 +368,10 @@ int load_syms(file_type)
             return 1;
         }
         reloc_table[i] = insert_sym(name, temp_len, temp_arity);
-        set_temp_ep(reloc_table[i], ep_offset*sizeof(BPLONG));
+        if (ep_offset >= 0){
+            set_temp_ep(reloc_table[i], ep_offset*sizeof(BPLONG));
+//            register_module_sym(name, temp_len, reloc_table[i]);
+        }
         count += temp_len + 6;
         i++;
     }
@@ -392,7 +394,7 @@ int load_syms(file_type)
 *************************************************************************/
 int c_GET_MODULE_SIGNATURE_cf() {
     BPLONG File;
-    CHAR_PTR file_name;
+    CHAR file_name[MAX_FILE_NAME_LEN];
     SYM_REC_PTR sym_ptr;
     CHAR name[256];
     BPLONG ep_offset;
@@ -402,14 +404,8 @@ int c_GET_MODULE_SIGNATURE_cf() {
     BPLONG ret_lst;
     BPLONG_PTR ret_lst_ptr;
 
-    File = ARG(1, 2); DEREF(File);
-    if (!ISATOM(File)) {
-        bp_exception = atom_expected;
-        return BP_FALSE;
-    }
-    sym_ptr = GET_ATM_SYM_REC(File);
-    file_name = GET_NAME(sym_ptr);
-
+    File = ARG(1, 2);
+    strcpy(file_name, get_file_name(File));
 #ifdef WIN32
     fp = fopen(file_name, "rb");
 #else
@@ -499,7 +495,7 @@ int load_text()
     BPLONG n;
     SYM_REC_PTR sym_ptr;
 
-    /*   printf("==> load_text \n");*/
+    //  printf("==> load_text \n");
 
     /* set text segments chain */
     inst_addr = (BPLONG_PTR)curr_fence;
@@ -537,7 +533,7 @@ int load_hashtab()
     BPLONG count = 0;
 
     CHECK_PCODE((CHAR_PTR)inst_addr, index_bytes);
-    /*   printf("==> load_hashtab \n"); */
+    //  printf("==> load_hashtab \n"); 
     while (count < index_bytes && eof_flag == 0) {
         if ((eof_flag = READ_DATA(buf_for_read, 1)))
             return 10;
@@ -554,7 +550,7 @@ int load_hashtab()
             return 1;
         alt = BB4(buf_for_read);
         alt = (BPLONG)RELOC_ADDR(alt);
-        if (eof_flag = get_index_tab(clause_no, &temp_len))
+        if ((eof_flag = get_index_tab(clause_no, &temp_len)))
             return eof_flag;
         inst_addr = gen_index(hash_inst_addr, clause_no, alt);
         count += (16 + temp_len);
@@ -563,9 +559,7 @@ int load_hashtab()
 }
 
 
-int get_index_tab(clause_no, lenptr)
-    BPLONG clause_no;
-    BPLONG_PTR lenptr;
+int get_index_tab(BPLONG clause_no, BPLONG_PTR lenptr)
 {
     BPLONG hashval, size, j;
     BPLONG count = 0;
@@ -719,10 +713,7 @@ BPLONG_PTR gen_index(BPLONG hash_inst_addr, BPLONG clause_no, BPLONG alt)
     return ep2;
 }
 
-static void inserth(ttype, val, label, bucket)
-    BPLONG ttype, val;
-BPLONG_PTR label;
-struct hrec *bucket;
+static void inserth(BPLONG ttype, BPLONG  val, BPLONG_PTR label, struct hrec *bucket)
 {
     BPLONG_PTR temp;
 
@@ -746,8 +737,7 @@ struct hrec *bucket;
     *hptr++ = *temp + sizeof(BPLONG)*3;  /* *hptr++ = (BPLONG)hptr; */
 }
 
-BPLONG bp_prime(numentry)
-    BPLONG numentry;
+BPLONG bp_prime(BPLONG numentry)
 {
     BPLONG i, j, temp;
 
@@ -766,8 +756,7 @@ hashsod:
 }
 
 /* return a prime-look number */
-BPLONG bp_hsize(numentry)
-    BPLONG numentry;
+BPLONG bp_hsize(BPLONG numentry)
 {
     BPLONG i, j, temp;
 
@@ -786,10 +775,7 @@ hashsod:
 }
 
 
-int dyn_loader(sym_ptr, file_type, load_damon)
-    SYM_REC_PTR sym_ptr;
-    BPLONG file_type;
-    BPLONG load_damon;
+int dyn_loader(SYM_REC_PTR sym_ptr, BPLONG file_type, BPLONG load_damon)
 {
     CHAR s[256], s1[256], s3[256];
     CHAR_PTR s2;
@@ -1176,11 +1162,7 @@ UW32 bp_str_hash( const char *key, int length, UW32 initval)
 #endif
 
 /****************************************************************************/
-INLINE SYM_REC_PTR search(name, length, arity, sym_ptr)
-    CHAR_PTR name;
-    BPLONG arity;
-    BPLONG length;
-    SYM_REC_PTR sym_ptr;
+INLINE SYM_REC_PTR search(CHAR_PTR name, BPLONG length, BPLONG arity, SYM_REC_PTR sym_ptr)
 {
     unsigned short i;
     CHAR_PTR nameptr;
@@ -1199,18 +1181,12 @@ INLINE SYM_REC_PTR search(name, length, arity, sym_ptr)
 }  /* end of search */
 
 /****************************************************************************/
-SYM_REC_PTR insert(name, length, arity)
-    const char *name;
-    BPLONG length;
-    BPLONG arity;
+SYM_REC_PTR insert(const char *name, BPLONG length, BPLONG arity)
 {
     return insert_sym(name, length, arity);
 }
 
-SYM_REC_PTR insert_sym(name, length, arity)
-    const char *name;
-    BPLONG length;
-    BPLONG arity;
+SYM_REC_PTR insert_sym(const char *name, BPLONG length, BPLONG arity)
 {
     BPLONG bucket_no;
     BPLONG i;
@@ -1218,7 +1194,7 @@ SYM_REC_PTR insert_sym(name, length, arity)
     CHAR_PTR nameptr;
 
     bucket_no = bp_str_hash(name, length, arity);
-    sym_ptr = (SYM_REC_PTR)hash_table[bucket_no];
+    sym_ptr = (SYM_REC_PTR)sym_hash_table[bucket_no];
     while (sym_ptr) {
         if (arity == GET_ARITY(sym_ptr) && length == GET_LENGTH(sym_ptr)) {
             nameptr = GET_NAME(sym_ptr);
@@ -1246,10 +1222,10 @@ SYM_REC_PTR insert_sym(name, length, arity)
     GET_EP(sym_ptr) = (int (*)(void))nil_sym;
     GET_ARITY(sym_ptr) = (UW32)arity;
     GET_LENGTH(sym_ptr) = (UW16)length;
-    GET_NEXT(sym_ptr) = hash_table[bucket_no];
+    GET_NEXT(sym_ptr) = sym_hash_table[bucket_no];
     GET_NAME(sym_ptr) = curr_fence;
 
-    hash_table[bucket_no] = sym_ptr;
+    sym_hash_table[bucket_no] = sym_ptr;
 
     for (i = 0; i < length; i++)
         *curr_fence++ = *name++;
@@ -1262,10 +1238,7 @@ SYM_REC_PTR insert_sym(name, length, arity)
 }  /* end of insert */
 
 /*********************************************/
-SYM_REC_PTR insert_cpred(name, arity, func)
-    CHAR_PTR name;
-    BPLONG arity;
-    int (*func)(void);
+SYM_REC_PTR insert_cpred(CHAR_PTR name, BPLONG arity, int (*func)(void))
 {
     BPLONG length;
     SYM_REC_PTR sym_ptr;
@@ -1277,21 +1250,14 @@ SYM_REC_PTR insert_cpred(name, arity, func)
     return sym_ptr;
 }
 
-int set_temp_ep(sym_ptr, ep)
-    SYM_REC_PTR sym_ptr;
-    BPLONG ep;
+void set_temp_ep(SYM_REC_PTR sym_ptr, BPLONG ep)
 {
-    if (ep >= 0) {
-        GET_ETYPE(sym_ptr) = T_TEMP_PRED;
-        GET_EP(sym_ptr) = (int (*)(void))ep;
-    }
-    return 0;
+    GET_ETYPE(sym_ptr) = T_TEMP_PRED;
+    GET_EP(sym_ptr) = (int (*)(void))ep;
 }
 
 /*********************************************/
-void set_real_ep(sym_ptr, base)
-    SYM_REC_PTR sym_ptr;
-    CHAR_PTR base;
+void set_real_ep(SYM_REC_PTR sym_ptr, CHAR_PTR base)
 {
     if (GET_ETYPE(sym_ptr) == T_TEMP_PRED) {
         GET_EP(sym_ptr) = (int (*)(void))(base + (BPLONG)GET_EP(sym_ptr));  /*???*/
@@ -1311,9 +1277,7 @@ void set_real_ep(sym_ptr, base)
 */
 
 /************************************?????????????????????*********/
-CHAR_PTR namestring(sym_ptr, s)
-    SYM_REC_PTR sym_ptr;
-    CHAR_PTR s;
+CHAR_PTR namestring(SYM_REC_PTR sym_ptr, CHAR_PTR s)
 {
     BPLONG i, len;
     CHAR_PTR st;
@@ -1349,7 +1313,7 @@ int c_CURRENT_PREDICATE() {
     name = GET_NAME(sym_ptr);
     length = strlen(name);
     bucket_no = bp_str_hash(name, length , n);
-    sym_ptr = search(name, length, n, hash_table[bucket_no]);
+    sym_ptr = search(name, length, n, sym_hash_table[bucket_no]);
     if (sym_ptr == NULL) return BP_FALSE;
 
     switch (GET_ETYPE(sym_ptr)) {
@@ -1371,7 +1335,7 @@ int c_CURRENT_PREDICATES() {
 
     temp1 = nil_sym;
     for (i = 0; i < BUCKET_CHAIN; ++i) {
-        sym_ptr = hash_table[i];
+        sym_ptr = sym_hash_table[i];
         while (sym_ptr != NULL) {
             switch (GET_ETYPE(sym_ptr)) {
             case T_DYNA:
@@ -1392,21 +1356,6 @@ int c_CURRENT_PREDICATES() {
         }
     }
     return unify(list, temp1);
-}
-
-SYM_REC_PTR look_for_sym_with_entrance(p)
-    BPLONG_PTR p;
-{
-    BPLONG i;
-    SYM_REC_PTR sym_ptr;
-    for (i = 0; i < BUCKET_CHAIN; ++i) {
-        sym_ptr = hash_table[i];
-        while (sym_ptr != NULL) {
-            if ((BPLONG)GET_ETYPE(sym_ptr) == T_PRED && (BPLONG)GET_EP(sym_ptr) == (BPLONG)p) return sym_ptr;
-            sym_ptr = GET_NEXT(sym_ptr);
-        }
-    }
-    return NULL;
 }
 
 /* load from in-memory lists */
@@ -1504,10 +1453,6 @@ int c_LOAD_BYTE_CODE_FROM_BPLISTS() {
     BPLONG BCSyms, BCInsts, BCHashTabs;
     BPLONG total_size;
 
-    void load_syms_fromlist();
-    void load_text_fromlist();
-    void load_hashtab_fromlist();
-
     psc_bytes = ARG(1, 6); DEREF(psc_bytes); psc_bytes = INTVAL(psc_bytes);
     text_bytes = ARG(2, 6); DEREF(text_bytes); text_bytes = INTVAL(text_bytes);
     index_bytes = ARG(3, 6); DEREF(index_bytes); index_bytes = INTVAL(index_bytes);
@@ -1522,7 +1467,7 @@ int c_LOAD_BYTE_CODE_FROM_BPLISTS() {
       write_term(BCHashTabs); printf("\n");
     */
 
-    total_size = sizeof(BPLONG)*text_bytes + index_bytes + psc_bytes + 1000;
+    total_size = sizeof(BPLONG)*(text_bytes + index_bytes + psc_bytes) + 10000;
     if ((CHAR_PTR)curr_fence+total_size > (CHAR_PTR)parea_water_mark) {
         int success = 0;
         if (total_size > parea_size) parea_size = total_size;
@@ -1547,8 +1492,7 @@ int c_LOAD_BYTE_CODE_FROM_BPLISTS() {
 /* Create symbols
    Each BCSym takes the form sym(EpOffset,Arity,Len,Sym).
 */
-void load_syms_fromlist(BCSyms)
-    BPLONG BCSyms;
+void load_syms_fromlist(BPLONG BCSyms)
 {
     BPLONG i, j;
 
@@ -1557,6 +1501,7 @@ void load_syms_fromlist(BCSyms)
         BPLONG_PTR list_ptr, struct_ptr;
         BPLONG sym_struct, ep_offset, arity, len, atm;
         SYM_REC_PTR sym_ptr;
+        CHAR_PTR name;
 
         list_ptr = (BPLONG_PTR)UNTAGGED_ADDR(BCSyms);
         sym_struct = FOLLOW(list_ptr); DEREF(sym_struct);
@@ -1568,9 +1513,12 @@ void load_syms_fromlist(BCSyms)
         len = FOLLOW(struct_ptr+3); DEREF(len); len = INTVAL(len);
         atm = FOLLOW(struct_ptr+4); DEREF(atm);
         sym_ptr = (SYM_REC_PTR)GET_ATM_SYM_REC(atm);
-        reloc_table[i] = insert_sym(GET_NAME(sym_ptr), len, arity);
-        set_temp_ep(reloc_table[i], ep_offset*sizeof(BPLONG));
-
+        name = GET_NAME(sym_ptr);
+        reloc_table[i] = insert_sym(name, len, arity);
+        if (ep_offset >= 0){
+            set_temp_ep(reloc_table[i], ep_offset*sizeof(BPLONG));
+//            register_module_sym(name, len, reloc_table[i]);
+        }
         i++;
         if (i >= MAXSYMS) {
             bp_exception = out_of_range;
@@ -1582,8 +1530,7 @@ void load_syms_fromlist(BCSyms)
         set_real_ep(reloc_table[j], curr_fence);
 }
 
-void load_text_fromlist(BCInsts)
-    BPLONG BCInsts;
+void load_text_fromlist(BPLONG BCInsts)
 {
     BPLONG n;
     SYM_REC_PTR sym_ptr;
@@ -1618,11 +1565,8 @@ void load_text_fromlist(BCInsts)
    BCHashTabs takes the form after_hash(Lab1,Op,Num,Lab2,HashArgs)
    where each HashArg takes the form hash_arg(Type,Nval,Lab)
 */
-void load_hashtab_fromlist(BCHashTabs)
-    BPLONG BCHashTabs;
+void load_hashtab_fromlist(BPLONG BCHashTabs)
 {
-    void get_index_tab_fromlist();
-
     CHECK_PCODE((CHAR_PTR)inst_addr, index_bytes);
     while (ISLIST(BCHashTabs)) {
         BPLONG hashtab, hash_inst_addr, hash_reg, alt, clause_no, HashArgs;
@@ -1651,8 +1595,7 @@ void load_hashtab_fromlist(BCHashTabs)
 }
 
 /* Recall that each HashArg takes the form hash_arg(Type,Nval,Lab) */
-void get_index_tab_fromlist(HashArgs, clause_no)
-    BPLONG HashArgs, clause_no;
+void get_index_tab_fromlist(BPLONG HashArgs, BPLONG clause_no)
 {
     BPLONG hashval, size, j;
     BPLONG val, ttype;
@@ -1813,11 +1756,9 @@ typedef struct {
 #include "bp_bc.h"
 #endif
 
+
 /* Load byte codes stored in C arrays */
 int load_byte_code_from_c_array() {
-    void load_syms_from_c_array();
-    void load_text_from_c_array();
-    void load_hashtab_from_c_array();
 
     load_syms_from_c_array();
     load_text_from_c_array();
@@ -1839,7 +1780,10 @@ void load_syms_from_c_array() {
 
     for (i = 0; i < num_of_syms; i++) {
         reloc_table[i] = insert_sym(bc_syms[i].name, bc_syms[i].len, bc_syms[i].arity);
-        set_temp_ep(reloc_table[i], (bc_syms[i].offset)*sizeof(BPLONG));
+        if (bc_syms[i].offset >= 0){
+            set_temp_ep(reloc_table[i], (bc_syms[i].offset)*sizeof(BPLONG));
+//            register_module_sym(bc_syms[i].name, bc_syms[i].len, reloc_table[i]);
+        }
     }
     ALIGN(CHAR_PTR, curr_fence);
     for (i = 0; i < num_of_syms; i++)
@@ -1886,14 +1830,12 @@ void load_hashtab_from_c_array() {
     BPLONG val, ttype;
     BPLONG_PTR label;
 
-    BPLONG n_hashtabs = 0;
     count = 0;
     hash_array_size = sizeof(bc_indecies)/sizeof(int);
 
     //  printf("hash_array_size =%d\n",hash_array_size);
 
     while (count < hash_array_size) {
-        n_hashtabs++;
         hash_inst_addr = (BPLONG)RELOC_ADDR(bc_indecies[count++]);
         //        hash_reg = bc_indecies[count++];
         bc_indecies[count++];
@@ -1951,3 +1893,54 @@ void load_hashtab_from_c_array() {
         inst_addr = gen_index(hash_inst_addr, clause_no, alt);
     }
 }
+
+/* if name matches "e$$module$$sym or "e$$module$$f$$sym", register the name into module_sym_hash_table. */
+/*
+  void register_module_sym(CHAR_PTR name, int len, SYM_REC_PTR name_sym){
+  BYTE type = 0;   // predicate, by default 
+  CHAR_PTR module_name_ptr, ptr;
+  int module_name_len;
+  BPLONG module, func, mq_func, bucket_no;
+  MODULE_SYM_REC_PTR module_sym_ptr;
+
+  if (len <= 7 || *name != 'e' || *(name+1) != '$' || *(name+2) != '$') 
+  return;
+  mq_func = ADDTAG(name_sym, ATM);
+  module_name_ptr = ptr = (name+3);
+  while (*ptr != '$') ptr++;
+  module_name_len = (ptr - module_name_ptr);
+  module = ADDTAG(insert_sym(module_name_ptr, module_name_len, 0), ATM);
+        
+  ptr++;
+  if (*ptr == 'f'){
+  type = 1;  // it's a function 
+  ptr += 3;
+  }
+  func = ADDTAG(insert_sym(ptr, (len - (ptr - name)), 0), ATM);
+        
+  bucket_no = bp_hashval(func) %  MODULE_BUCKET_CHAIN;
+  module_sym_ptr = (MODULE_SYM_REC_PTR)module_sym_hash_table[bucket_no];
+  while (module_sym_ptr) {
+  if (module_sym_ptr->func == func && module_sym_ptr->module == module && module_sym_ptr->type == type)
+  return;
+  module_sym_ptr = module_sym_ptr->next;
+  }
+
+  if (curr_fence >= (CHAR_PTR)parea_water_mark) {
+  int success = 0;
+  ALLOCATE_NEW_PAREA_BLOCK(parea_size, success);
+  if (success == 0) myquit(OUT_OF_MEMORY, "ld");
+  }
+
+  ALIGN(CHAR_PTR, curr_fence);  / insert a sym record 
+  module_sym_ptr = (MODULE_SYM_REC_PTR)curr_fence;
+  curr_fence += sizeof(struct module_sym_rec);
+  module_sym_ptr->func = func;
+  module_sym_ptr->type = type;
+  module_sym_ptr->type = module;
+  module_sym_ptr->mq_func = mq_func;
+  module_sym_ptr->next = module_sym_hash_table[bucket_no];
+  module_sym_hash_table[bucket_no] = module_sym_ptr;
+  } 
+
+*/

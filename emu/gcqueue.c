@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : gcQueue.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
  *   Purpose: Queue class and other utilities used by the GC
 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -135,8 +135,7 @@ void gcDisposeDynamicArray() {
 }
 
 /*********** utilities on bit mask ****************/
-int allocateMaskArea(size)
-    BPLONG size;
+int allocateMaskArea(BPLONG size)
 {
     int i;
 
@@ -165,9 +164,7 @@ addr, addr+1,...,addr+size-1 to be 1
    -------------------
 *****************************************************/
 
-void gcSetMask(addr, size, base)
-    BPLONG_PTR addr, base;
-BPLONG size;
+void gcSetMask(BPLONG_PTR addr, BPLONG size, BPLONG_PTR base)
 {
     int i;
 
@@ -177,8 +174,7 @@ BPLONG size;
 }
 
 
-int gcIsMarked(addr, base)
-    BPLONG_PTR addr, base;
+int gcIsMarked(BPLONG_PTR addr, BPLONG_PTR base)
 {
 
     BPULONG offset = ((BPULONG)addr-(BPULONG)base)/sizeof(BPLONG);

@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : clpfd.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
  *   Purpose: Primitives on domain variables and constraints
 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -35,8 +35,7 @@
         }                                                       \
     }
 
-int dvar_bv(op)
-    BPLONG op;
+int dvar_bv(BPLONG op)
 {
     BPLONG_PTR dv_ptr;
     BPLONG_PTR top;
@@ -49,8 +48,7 @@ int dvar_bv(op)
     return 0;
 }
 
-int dvar_excludable_or_int(op)
-    BPLONG op;
+int dvar_excludable_or_int(BPLONG op)
 {
     BPLONG_PTR dv_ptr;
     BPLONG_PTR top;
@@ -60,14 +58,13 @@ int dvar_excludable_or_int(op)
     if (IS_SUSP_VAR(op)) {
         dv_ptr = (BPLONG_PTR)UNTAGGED_TOPON_ADDR(op);
         if (IS_UN_DOMAIN(dv_ptr) ||
-            IS_IT_DOMAIN(dv_ptr) && !IS_SMALL_DOMAIN(dv_ptr)) return 0;
+            (IS_IT_DOMAIN(dv_ptr) && !IS_SMALL_DOMAIN(dv_ptr))) return 0;
         return 1;
     }
     return 0;
 }
 
-int b_EXCLUDABLE_LIST_c(list)
-    BPLONG list;
+int b_EXCLUDABLE_LIST_c(BPLONG list)
 {
     BPLONG_PTR ptr, top;
     BPLONG op;
@@ -84,14 +81,12 @@ int b_EXCLUDABLE_LIST_c(list)
     return BP_ERROR;
 }
 
-int nondvar(op)
-    BPLONG op;
+int nondvar(BPLONG op)
 {
     return (dvar(op) ? 0 : 1);
 }
 
-int dvar(op)
-    BPLONG op;
+int dvar(BPLONG op)
 {
     BPLONG_PTR dv_ptr;
     BPLONG_PTR top;
@@ -104,8 +99,7 @@ int dvar(op)
     return 0;
 }
 
-int dvar_or_int(op)
-    BPLONG op;
+int dvar_or_int(BPLONG op)
 {
     BPLONG_PTR dv_ptr;
     BPLONG_PTR top;
@@ -120,8 +114,7 @@ int dvar_or_int(op)
 }
 
 /* check while counting. Return -1 immediately if the count exceeds limit. */
-int n_vars_gt(count0, op, limit)
-    BPLONG count0, op, limit;
+int n_vars_gt(BPLONG count0, BPLONG op, BPLONG limit)
 {
     BPLONG i, arity;
     BPLONG_PTR top;
@@ -145,8 +138,7 @@ int n_vars_gt(count0, op, limit)
     return count0;
 }
 
-int trigger_vars_ins(op)
-    BPLONG op;
+int trigger_vars_ins(BPLONG op)
 {
     BPLONG i, arity;
     BPLONG_PTR top, dv_ptr;
@@ -169,8 +161,7 @@ int trigger_vars_ins(op)
     return 1;
 }
 
-int trigger_vars_minmax(op)
-    BPLONG op;
+int trigger_vars_minmax(BPLONG op)
 {
     BPLONG i, arity;
     BPLONG_PTR top, dv_ptr;
@@ -193,8 +184,7 @@ int trigger_vars_minmax(op)
     return 1;
 }
 
-int trigger_vars_dom(op)
-    BPLONG op;
+int trigger_vars_dom(BPLONG op)
 {
     BPLONG i, arity;
     BPLONG_PTR top, dv_ptr;
@@ -217,8 +207,7 @@ int trigger_vars_dom(op)
     return 1;
 }
 
-int trigger_vars_any_dom(op)
-    BPLONG op;
+int trigger_vars_any_dom(BPLONG op)
 {
     BPLONG i, arity;
     BPLONG_PTR top, dv_ptr;
@@ -253,8 +242,7 @@ int exclude_elm_dvars() {
 }
 
 
-int b_EXCLUDE_ELM_DVARS(P_elm, P_list1, P_list2)
-    BPLONG P_elm, P_list1, P_list2;
+int b_EXCLUDE_ELM_DVARS(BPLONG P_elm, BPLONG P_list1, BPLONG P_list2)
 {
     BPLONG elm, P_v, processing_part, P_list;
     BPLONG_PTR dv_ptr, ptr;
@@ -301,8 +289,7 @@ int exclude_elm_vcs() {
     return b_EXCLUDE_ELM_VCS(elm, P_list);
 }
 
-int b_EXCLUDE_ELM_VCS(elm, P_list)
-    BPLONG elm, P_list;
+int b_EXCLUDE_ELM_VCS(BPLONG elm, BPLONG P_list)
 {
     BPLONG xc;
     BPLONG_PTR dv_ptr, ptr;
@@ -340,15 +327,11 @@ int b_EXCLUDE_ELM_VCS(elm, P_list)
   Select a variable based on the first-fail principle.
   No dereference needed because the list was just copied.
 */
-int b_select_ff(Vars, BestVar)
-    BPLONG BestVar, Vars;
+int b_select_ff(BPLONG Vars, BPLONG BestVar)
 {
     BPLONG Var;
     BPLONG_PTR dv_ptr, dv_ptr0, ptr;
     BPLONG size, size0;
-
-    BPLONG Vars0;
-    Vars0 = Vars;
 
     DEREF_NONVAR(Vars);
     while (ISLIST(Vars)) {
@@ -382,14 +365,11 @@ int b_select_ff(Vars, BestVar)
   Select a variable based on the first-fail principle,
   breaking ties by selecting a variable with the smallest lower bound.
 */
-int b_SELECT_FF_MIN_cf(Vars, BestVar)
-    BPLONG BestVar, Vars;
+int b_SELECT_FF_MIN_cf(BPLONG Vars, BPLONG BestVar)
 {
     BPLONG Var, size0, size;
     BPLONG_PTR dv_ptr, dv_ptr0, ptr;
 
-    BPLONG Vars0;
-    Vars0 = Vars;
 
     DEREF_NONVAR(Vars);
     while (ISLIST(Vars)) {
@@ -422,14 +402,10 @@ int b_SELECT_FF_MIN_cf(Vars, BestVar)
   Select a variable based on the first-fail principle,
   breaking ties by selecting a variable with the largest uppper bound.
 */
-int b_SELECT_FF_MAX_cf(Vars, BestVar)
-    BPLONG BestVar, Vars;
+int b_SELECT_FF_MAX_cf(BPLONG Vars, BPLONG BestVar)
 {
     BPLONG Var, size, size0;
     BPLONG_PTR dv_ptr, dv_ptr0, ptr;
-
-    BPLONG Vars0;
-    Vars0 = Vars;
 
     DEREF_NONVAR(Vars);
     while (ISLIST(Vars)) {
@@ -462,14 +438,10 @@ int b_SELECT_FF_MAX_cf(Vars, BestVar)
   Select a variable with the smallest lower bound, breaking ties by selecting 
   the left-most one with the smallest domain.
 */
-int b_SELECT_MIN_cf(Vars, BestVar)
-    BPLONG BestVar, Vars;
+int b_SELECT_MIN_cf(BPLONG Vars, BPLONG BestVar)
 {
     BPLONG Var, min, min0;
     BPLONG_PTR dv_ptr, dv_ptr0, ptr;
-
-    BPLONG Vars0;
-    Vars0 = Vars;
 
     DEREF_NONVAR(Vars);
     while (ISLIST(Vars)) {
@@ -502,14 +474,10 @@ int b_SELECT_MIN_cf(Vars, BestVar)
   Select a variable with the smallest lower bound, breaking ties by selecting 
   the left-most one with the smallest domain.
 */
-int b_SELECT_MAX_cf(Vars, BestVar)
-    BPLONG BestVar, Vars;
+int b_SELECT_MAX_cf(BPLONG Vars, BPLONG BestVar)
 {
     BPLONG Var, max0, max;
     BPLONG_PTR dv_ptr, dv_ptr0, ptr;
-
-    BPLONG Vars0;
-    Vars0 = Vars;
 
     DEREF_NONVAR(Vars);
     while (ISLIST(Vars)) {
@@ -538,8 +506,7 @@ int b_SELECT_MAX_cf(Vars, BestVar)
     return 0;
 }
 
-int b_CONSTRAINTS_NUMBER_cf(Var, N)
-    BPLONG Var, N;
+int b_CONSTRAINTS_NUMBER_cf(BPLONG Var, BPLONG N)
 {
     BPLONG_PTR ptr;
     BPLONG lst, count, attrs;
@@ -580,8 +547,7 @@ int b_CONSTRAINTS_NUMBER_cf(Var, N)
     return BP_TRUE;
 }
 
-int count_cs_list(list)
-    BPLONG list;
+int count_cs_list(BPLONG list)
 {
     int i = 0;
     BPLONG_PTR ptr;
@@ -621,8 +587,7 @@ int c_fd_degree() {
     return BP_TRUE;
 }
 
-int dvar_degree_count_connected_vars_cs(cs)
-    BPLONG cs;
+int dvar_degree_count_connected_vars_cs(BPLONG cs)
 {
     BPLONG_PTR ptr, sf;
     BPLONG constr, count = 0;
@@ -637,8 +602,7 @@ int dvar_degree_count_connected_vars_cs(cs)
     return count;
 }
 
-int dvar_degree_count_connected_vars_frame(f)
-    BPLONG_PTR f;
+int dvar_degree_count_connected_vars_frame(BPLONG_PTR f)
 {
     BPLONG_PTR sp;
     BPLONG count = 0;
@@ -651,8 +615,7 @@ int dvar_degree_count_connected_vars_frame(f)
     return count;
 }
 
-int dvar_degree_count_connected_vars_term(term)
-    BPLONG term;
+int dvar_degree_count_connected_vars_term(BPLONG term)
 {
     BPLONG_PTR dv_ptr, ptr, top;
     BPLONG cs, count;
@@ -673,7 +636,7 @@ start:
         term = FOLLOW(ptr+1);
         goto start;
     } else if (ISSTRUCT(term)) {
-        BPLONG i, arity, count;
+        BPLONG i, arity;
         ptr = (BPLONG_PTR)UNTAGGED_ADDR(term);
         arity = GET_ARITY((SYM_REC_PTR)FOLLOW(ptr));
         count = 0;
@@ -684,8 +647,7 @@ start:
     return count;
 }
 
-void dvar_degree_reset_cs_tags_cs(cs)
-    BPLONG cs;
+void dvar_degree_reset_cs_tags_cs(BPLONG cs)
 {
     BPLONG_PTR ptr, sf;
     BPLONG constr;
@@ -699,8 +661,7 @@ void dvar_degree_reset_cs_tags_cs(cs)
     }
 }
 
-void dvar_degree_reset_cs_tags_frame(f)
-    BPLONG_PTR f;
+void dvar_degree_reset_cs_tags_frame(BPLONG_PTR f)
 {
     BPLONG_PTR sp;
 
@@ -711,8 +672,7 @@ void dvar_degree_reset_cs_tags_frame(f)
     }
 }
 
-void dvar_degree_reset_cs_tags_term(term)
-    BPLONG term;
+void dvar_degree_reset_cs_tags_term(BPLONG term)
 {
     BPLONG_PTR dv_ptr, ptr, top;
     BPLONG cs;
@@ -744,8 +704,7 @@ start:
     }
 }
 
-void display_constraint(frame)
-    BPLONG_PTR frame;
+void display_constraint(BPLONG_PTR frame)
 {
     SYM_REC_PTR sym_ptr;
     BPLONG arity, i;
@@ -782,8 +741,7 @@ int c_VV_EQ_C_CON() {
     return b_VV_EQ_C_CON_ccc(X, Y, C);
 }
 
-int b_VV_EQ_C_CON_ccc(X, Y, C)
-    BPLONG X, Y, C;
+int b_VV_EQ_C_CON_ccc(BPLONG X, BPLONG Y, BPLONG C)
 {
     BPLONG_PTR dv_ptr_x, dv_ptr_y;
 
@@ -805,9 +763,7 @@ int b_VV_EQ_C_CON_ccc(X, Y, C)
     return BP_TRUE;
 }
 
-int c_VV_EQ_C_CON_aux(dv_ptr_x, dv_ptr_y, C)
-    BPLONG C;
-BPLONG_PTR dv_ptr_x, dv_ptr_y;
+int c_VV_EQ_C_CON_aux(BPLONG_PTR dv_ptr_x, BPLONG_PTR dv_ptr_y, BPLONG C)
 {
     BPLONG currX, currY, maxX, minY, maxY;
 
@@ -842,8 +798,7 @@ int c_V_EQ_VC_CON() {
     return b_V_EQ_VC_CON_ccc(X, Y, C);
 }
 
-int b_V_EQ_VC_CON_ccc(X, Y, C)
-    BPLONG X, Y, C;
+int b_V_EQ_VC_CON_ccc(BPLONG X, BPLONG Y, BPLONG C)
 {
     BPLONG_PTR dv_ptr_x, dv_ptr_y;
 
@@ -864,9 +819,7 @@ int b_V_EQ_VC_CON_ccc(X, Y, C)
     return BP_TRUE;
 }
 
-int c_V_EQ_VC_CON_aux(dv_ptr_x, dv_ptr_y, C)
-    BPLONG C;
-BPLONG_PTR dv_ptr_x, dv_ptr_y;
+int c_V_EQ_VC_CON_aux(BPLONG_PTR dv_ptr_x, BPLONG_PTR dv_ptr_y, BPLONG C)
 {
     BPLONG currX, currY, maxX, minY, maxY;
 
@@ -918,9 +871,7 @@ int c_UU_EQ_C_CON() {
 }
 
 /* for each x in X, there is an y in Y such that A*x+B*y=C */
-int c_UU_EQ_C_CON_aux(A, dv_ptr_x, B, dv_ptr_y, C)
-    BPLONG A, B, C;
-BPLONG_PTR dv_ptr_x, dv_ptr_y;
+int c_UU_EQ_C_CON_aux(BPLONG A, BPLONG_PTR dv_ptr_x, BPLONG B, BPLONG_PTR dv_ptr_y, BPLONG C)
 {
     BPLONG tmp, currX, currY, maxX, minY, maxY;
 
@@ -947,7 +898,7 @@ void print_event_queue() {
     int i;
     printf("trigger_no=" BPLONG_FMT_STR "\n", trigger_no);
     for (i = 1; i <= trigger_no; i++) {
-        printf("FLAG(%d) queue(" BPULONG_FMT_STR ")\n", event_flag[i], triggeredCs[i]);
+        printf("FLAG(%d) queue(" BPULONG_FMT_STR ")\n", event_flag[i], (BPULONG)triggeredCs[i]);
     }
     if (trigger_no >= 1) printf("\n");
 }
@@ -977,9 +928,7 @@ int c_U_EQ_UC_CON() {
 }
 
 /* for each x in X, there is a y in Y such that A*x=B*y+C */
-int c_U_EQ_UC_CON_aux(A, dv_ptr_x, B, dv_ptr_y, C)
-    BPLONG A, B, C;
-BPLONG_PTR dv_ptr_x, dv_ptr_y;
+int c_U_EQ_UC_CON_aux(BPLONG A, BPLONG_PTR dv_ptr_x, BPLONG B, BPLONG_PTR dv_ptr_y, BPLONG C)
 {
     BPLONG tmp, currX, currY, maxX, minY, maxY;
 
@@ -1028,8 +977,7 @@ BPLONG_PTR dv_ptr_x, dv_ptr_y;
   ;
   true).
 */
-int b_CLPSET_CARD_BOUND_c(SetTerm)
-    BPLONG SetTerm;
+int b_CLPSET_CARD_BOUND_c(BPLONG SetTerm)
 {
     BPLONG_PTR top, ptr, sa_dv_ptr, sp_dv_ptr;
     BPLONG SP, SA, Card, Ref, USize, Tag;
@@ -1078,8 +1026,7 @@ int b_CLPSET_CARD_BOUND_c(SetTerm)
   true
   ).
 */
-int b_CLPSET_LOW_UPDATED_c(SetTerm)
-    BPLONG SetTerm;
+int b_CLPSET_LOW_UPDATED_c(BPLONG SetTerm)
 {
     BPLONG_PTR top, ptr, dv_ptr, sp_dv_ptr, sa_dv_ptr;
     BPLONG SP, SA, Card, Ref, USize, SASize;
@@ -1122,8 +1069,7 @@ int b_CLPSET_LOW_UPDATED_c(SetTerm)
   ;  
   true).
 */
-int b_CLPSET_UP_UPDATED_c(SetTerm)
-    BPLONG SetTerm;
+int b_CLPSET_UP_UPDATED_c(BPLONG SetTerm)
 {
     BPLONG_PTR top, ptr, dv_ptr, sa_dv_ptr, sp_dv_ptr;
     BPLONG SP, SA, Card, Ref, SPSize;
@@ -1175,8 +1121,7 @@ int b_CLPSET_UP_UPDATED_c(SetTerm)
   Set=(Cur,Set1),
   $clpset_dvar_indomain_pickup_all_possible(SP,SA,Next,Last,Set1).
 */
-BPLONG clpset_pickup_all_possible(sp_dv_ptr, sa_dv_ptr)
-    BPLONG_PTR sp_dv_ptr, sa_dv_ptr;
+BPLONG clpset_pickup_all_possible(BPLONG_PTR sp_dv_ptr, BPLONG_PTR sa_dv_ptr)
 {
     BPLONG set0, return_val;
     BPLONG_PTR set_tail_ptr;
@@ -1235,9 +1180,7 @@ BPLONG clpset_pickup_all_possible(sp_dv_ptr, sa_dv_ptr)
   domain_next_inst(SP,Cur,Next),
   $clpset_dvar_indomain_pickup_only_in(SP,SA,Next,Last,Set1,Card1).
 */
-BPLONG clpset_pickup_only_in(sp_dv_ptr, sa_dv_ptr, card)
-    BPLONG_PTR sp_dv_ptr, sa_dv_ptr;
-BPLONG card;
+BPLONG clpset_pickup_only_in(BPLONG_PTR sp_dv_ptr, BPLONG_PTR sa_dv_ptr, BPLONG card)
 {
     BPLONG last, cur;
 
@@ -1275,9 +1218,7 @@ BPLONG card;
     }
 }
 
-void clpset_exclude_all_possible(sp_dv_ptr, cur, last)
-    BPLONG_PTR sp_dv_ptr;
-BPLONG cur, last;
+void clpset_exclude_all_possible(BPLONG_PTR sp_dv_ptr, BPLONG cur, BPLONG last)
 {
     while (cur != last) {
         domain_set_false_noint(sp_dv_ptr, cur);
@@ -1303,8 +1244,7 @@ BPLONG cur, last;
   (b_DM_TRUE_cc(Y,X)->true;B=0).
   reify_eq_constr_consistency(B,X,Y):-true : true.
 */
-int b_REIFY_EQ_CONSTR_ACTION(B, X, Y)
-    BPLONG X, Y, B;
+int b_REIFY_EQ_CONSTR_ACTION(BPLONG B, BPLONG X, BPLONG Y)
 {
     BPLONG_PTR dv_ptr_x, dv_ptr_y, dv_ptr_b;
 
@@ -1349,8 +1289,7 @@ int b_REIFY_EQ_CONSTR_ACTION(B, X, Y)
   true).
   %    write('<=reify_ge_constr_consistency'(B,X,Y)),nl.
 */
-int b_REIFY_GE_CONSTR_ACTION(B, X, Y)
-    BPLONG X, Y, B;
+int b_REIFY_GE_CONSTR_ACTION(BPLONG B, BPLONG X, BPLONG Y)
 {
     BPLONG_PTR dv_ptr_x, dv_ptr_y, dv_ptr_b;
     BPLONG min_x, max_x, min_y, max_y;
@@ -1399,11 +1338,9 @@ int b_REIFY_GE_CONSTR_ACTION(B, X, Y)
   (b_DM_TRUE_cc(Y,X)->true;B=1).
   reify_neq_constr_consistency(B,X,Y):-true : true.
 */
-int b_REIFY_NEQ_CONSTR_ACTION(B, X, Y)
-    BPLONG B, X, Y;
+int b_REIFY_NEQ_CONSTR_ACTION(BPLONG B, BPLONG X, BPLONG Y)
 {
     BPLONG_PTR dv_ptr_x, dv_ptr_y, dv_ptr_b;
-
     /*
       B = FOLLOW(arreg+3);DEREF_NONVAR(B); 
       X = FOLLOW(arreg+2);DEREF_NONVAR(X); 
@@ -1444,8 +1381,7 @@ int b_REIFY_NEQ_CONSTR_ACTION(B, X, Y)
   for each x in X, |x| is in Y;
   for each y in Y, either y or -y is in X
 */
-int b_ABS_CON_cc(X, Y)
-    BPLONG X, Y;
+int b_ABS_CON_cc(BPLONG X, BPLONG Y)
 {
     BPLONG_PTR dv_ptr_x, dv_ptr_y;
     BPLONG elm, melm, minX, maxX, minY, maxY;
@@ -1485,8 +1421,7 @@ int b_ABS_CON_cc(X, Y)
   domain_region_max(Y,Up)).
 */
 /* when X updated */
-int b_FD_ABS_X_TO_Y(X, Y)
-    BPLONG X, Y;
+int b_FD_ABS_X_TO_Y(BPLONG X, BPLONG Y)
 {
     BPLONG_PTR dv_ptr_x, dv_ptr_y;
     BPLONG minX, maxX, up;
@@ -1524,8 +1459,7 @@ int b_FD_ABS_X_TO_Y(X, Y)
 /* X mod Y = Z (precondition integer(Y),Y>0,min(X)>=0)
    for each x in X if (x mod Y) is not in Z, then exclude x from X
 */
-int b_MOD_CON_ccc(X, Y, Z)
-    BPLONG X, Y, Z;
+int b_MOD_CON_ccc(BPLONG X, BPLONG Y, BPLONG Z)
 {
     BPLONG_PTR dv_ptr_x, dv_ptr_z;
     BPLONG currX, maxX;
@@ -1537,6 +1471,8 @@ int b_MOD_CON_ccc(X, Y, Z)
     dv_ptr_x = (BPLONG_PTR)UNTAGGED_TOPON_ADDR(X);
     currX = DV_first(dv_ptr_x);
     maxX = DV_last(dv_ptr_x);
+    if (maxX >= 3000)
+        return BP_TRUE;
     if (ISINT(Z)) {
         Z = INTVAL(Z);
         while (currX <= maxX) {
@@ -1570,8 +1506,7 @@ int b_MOD_CON_ccc(X, Y, Z)
    Z in min(X)//Y..max(X)//Y
    X in min(Z)*Y..(max(Z)+1)*Y-1
 */
-int b_IDIV_CON_ccc(X, Y, Z)
-    BPLONG X, Y, Z;
+int b_IDIV_CON_ccc(BPLONG X, BPLONG Y, BPLONG Z)
 {
     BPLONG_PTR dv_ptr_x, dv_ptr_z;
     BPLONG low, up;
@@ -1608,8 +1543,7 @@ int b_IDIV_CON_ccc(X, Y, Z)
   for each x in X, either x-N or x+N must be in Y.
   for each y in Y, either y-N or y+N must be in X.
 */
-int b_ABS_DIFF_CON_ccc(X, Y, N)
-    BPLONG X, Y, N;
+int b_ABS_DIFF_CON_ccc(BPLONG X, BPLONG Y, BPLONG N)
 {
     BPLONG_PTR dv_ptr_x, dv_ptr_y;
     BPLONG elm, min, max;
@@ -1642,8 +1576,7 @@ int b_ABS_DIFF_CON_ccc(X, Y, N)
 /* abs(X-Y) = N
    triggered after Ex is excluded from X
 */
-int b_ABS_DIFF_X_TO_Y(Ex)
-    BPLONG Ex;
+int b_ABS_DIFF_X_TO_Y(BPLONG Ex)
 {
     BPLONG X, Y, N, Ey;
     BPLONG_PTR dv_ptr_x, dv_ptr_y;

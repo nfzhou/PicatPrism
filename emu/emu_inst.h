@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : emu_inst.h
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2022
  *   THIS FILE IS AUTOMATICALLY ASSEMBLED. 
 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -6642,16 +6642,27 @@ lab_throw_ball:
         BPLONG_PTR btm_ptr;
         BPLONG_PTR af = AR;  /* ancestor frame */
         BPLONG_PTR b = B;
+        bp_stacktrace_lst = nil_sym;
         while ((BPLONG)af != AR_AR(af)) {
+            btm_ptr = (BPLONG_PTR)UNTAGGED_ADDR(AR_BTM(af));
+            if (btm_ptr > af){
+                op3 = FOLLOW(btm_ptr);
+                DEREF(op3);
+                if (ISSTRUCT(op3)){
+                    *(H) = op3;
+                    *(H+1) = bp_stacktrace_lst;
+                    bp_stacktrace_lst = ADDTAG(H, LST);
+                    H += 2;
+                }
+            }
             while (b <= af) {
-                RESET_SUBGOAL_AR(b);
+                RESET_TABLED_SUBGOAL_AR(b);
                 if (IS_CATCHER_FRAME(b)) {
                     btm_ptr = (BPLONG_PTR)UNTAGGED_ADDR(AR_BTM(b));  /* a catcher frame is in the form of p(Flag,Cleanup,Calll,Exception,Recovery,...) */
                     catch_all_flag = FOLLOW(btm_ptr);
                     except = FOLLOW(btm_ptr-3);
                     if ((catch_all_flag == BP_ONE || b == af) && is_UNIFIABLE(op1, except)) {  /* this catcher catches the exception */
                         FOLLOW(op2) = ADDTAG((BPULONG)stack_up_addr-(BPULONG)b, INT_TAG);
-                        //                                        reset_temp_complete_subgoal_entries();
                         CONTCASE;
                     }
                 }
@@ -6660,7 +6671,7 @@ lab_throw_ball:
             af = (BPLONG_PTR)AR_AR(af);
         }
         FOLLOW(op2) = ADDTAG((BPULONG)stack_up_addr-(BPULONG)af, INT_TAG);
-        //              reset_temp_complete_subgoal_entries();
+        //        write_term(bp_stacktrace_lst); printf("\n");
         CONTCASE;
     }
 

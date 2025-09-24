@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : arith.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
  *   Purpose: arithmetic functions 
 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -151,8 +151,7 @@ void init_arith_sym() {
     xor2 = insert_sym("xor", 3, 2);
 }
 
-BPLONG bp_math_add(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_math_add(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -203,8 +202,7 @@ BPLONG bp_math_add(op1, op2)
 }
 
 
-BPLONG bp_math_sub(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_math_sub(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -251,11 +249,9 @@ BPLONG bp_math_sub(op1, op2)
 }
 
 
-BPLONG bp_math_mul(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_math_mul(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
-    BPLONG op3;
 
     DEREF(op1); DEREF(op2);
     if (!ISNUM(op1)) {
@@ -311,8 +307,7 @@ BPLONG bp_math_mul(op1, op2)
     }
 }
 
-BPLONG bp_math_divge(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_math_divge(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -356,8 +351,7 @@ BPLONG bp_math_divge(op1, op2)
     }
 }
 
-BPLONG bp_math_divle(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_math_divle(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -402,8 +396,7 @@ BPLONG bp_math_divle(op1, op2)
     }
 }
 
-BPLONG bp_math_div(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_math_div(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -468,8 +461,7 @@ BPLONG bp_math_div(op1, op2)
     }
 }
 
-BPLONG bp_math_idiv(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_math_idiv(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -537,8 +529,7 @@ BPLONG bp_math_idiv(op1, op2)
 }
 
 /* op1 div op2 = (op1 - (op1 mod op2))/op2 */
-BPLONG bp_math_idiv_div(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_math_idiv_div(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -598,8 +589,7 @@ BPLONG bp_math_idiv_div(op1, op2)
     }
 }
 
-BPLONG bp_math_mod(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_math_mod(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
     double f;
@@ -664,8 +654,7 @@ BPLONG bp_math_mod(op1, op2)
     }
 }
 
-BPLONG bp_math_rem(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_math_rem(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -758,8 +747,7 @@ BPLONG bp_math_rem(op1, op2)
     }
 }
 
-BPLONG bp_bitwise_and(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_bitwise_and(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -799,8 +787,7 @@ BPLONG bp_bitwise_and(op1, op2)
     }
 }
 
-BPLONG bp_bitwise_or(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_bitwise_or(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -840,8 +827,7 @@ BPLONG bp_bitwise_or(op1, op2)
     }
 }
 
-BPLONG bp_bitwise_shiftl(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_bitwise_shiftl(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -885,8 +871,7 @@ BPLONG bp_bitwise_shiftl(op1, op2)
 }
 
 
-BPLONG bp_bitwise_shiftr(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_bitwise_shiftr(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -926,8 +911,7 @@ BPLONG bp_bitwise_shiftr(op1, op2)
 }
 
 
-BPLONG bp_bitwise_complement(op1)
-    BPLONG op1;
+BPLONG bp_bitwise_complement(BPLONG op1)
 {
 
     BPLONG_PTR top;
@@ -957,8 +941,7 @@ BPLONG bp_bitwise_complement(op1)
     }
 }
 
-BPLONG bp_bitwise_xor(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_bitwise_xor(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
     DEREF(op1); DEREF(op2);
@@ -1001,8 +984,7 @@ BPLONG bp_bitwise_xor(op1, op2)
     }
 }
 
-BPLONG bp_math_integer(op1)
-    BPLONG op1;
+BPLONG bp_math_integer(BPLONG op1)
 {
     BPLONG_PTR top;
 
@@ -1027,8 +1009,7 @@ BPLONG bp_math_integer(op1)
     }
 }
 
-BPLONG bp_math_sign(op1)
-    BPLONG op1;
+BPLONG bp_math_sign(BPLONG op1)
 {
     double f;
     BPLONG_PTR top;
@@ -1063,8 +1044,7 @@ BPLONG bp_math_sign(op1)
     }
 }
 
-int b_FLOAT_SIGN_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_SIGN_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_math_sign(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -1072,8 +1052,7 @@ int b_FLOAT_SIGN_cf(op1, op2)
     return BP_TRUE;
 }
 
-BPLONG bp_math_max(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_math_max(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
     double f1, f2;
@@ -1127,8 +1106,7 @@ BPLONG bp_math_max(op1, op2)
     }
 }
 
-BPLONG bp_math_min(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_math_min(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
     double f1, f2;
@@ -1184,8 +1162,7 @@ BPLONG bp_math_min(op1, op2)
 }
 
 
-BPLONG bp_math_min1(op1)
-    BPLONG op1;
+BPLONG bp_math_min1(BPLONG op1)
 {
     BPLONG min_elm, cur_elm, op0;
     BPLONG_PTR top, ptr;
@@ -1217,8 +1194,7 @@ BPLONG bp_math_min1(op1)
     return min_elm;
 }
 
-BPLONG bp_math_max1(op1)
-    BPLONG op1;
+BPLONG bp_math_max1(BPLONG op1)
 {
     BPLONG max_elm, cur_elm, op0;
     BPLONG_PTR top, ptr;
@@ -1250,8 +1226,7 @@ BPLONG bp_math_max1(op1)
     return max_elm;
 }
 
-BPLONG bp_math_sum1(op1)
-    BPLONG op1;
+BPLONG bp_math_sum1(BPLONG op1)
 {
     BPLONG sum, cur_elm, op0;
     BPLONG_PTR top, ptr;
@@ -1289,8 +1264,7 @@ BPLONG bp_math_sum1(op1)
     return sum;
 }
 
-BPLONG bp_math_prod1(op1)
-    BPLONG op1;
+BPLONG bp_math_prod1(BPLONG op1)
 {
     BPLONG prod, cur_elm, op0;
     BPLONG_PTR top, ptr;
@@ -1329,8 +1303,7 @@ BPLONG bp_math_prod1(op1)
 }
 
 
-BPLONG bp_math_fract_part(op1)
-    BPLONG op1;
+BPLONG bp_math_fract_part(BPLONG op1)
 {
     double f, intf;
     BPLONG_PTR top;
@@ -1345,8 +1318,7 @@ BPLONG bp_math_fract_part(op1)
     return encodefloat1(f);
 }
 
-BPLONG bp_math_int_part(op1)
-    BPLONG op1;
+BPLONG bp_math_int_part(BPLONG op1)
 {
     double f, intf;
     BPLONG_PTR top;
@@ -1366,8 +1338,7 @@ BPLONG bp_math_random0() {
     return MAKEINT(rand());
 }
 
-BPLONG bp_math_random1(op1)
-    BPLONG op1;
+BPLONG bp_math_random1(BPLONG op1)
 {
     BPLONG_PTR top;
 
@@ -1404,8 +1375,7 @@ BPLONG bp_gcd_int_int(BPLONG i1, BPLONG i2) {
     return i2;
 }
 
-BPLONG bp_math_gcd(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_math_gcd(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -1444,14 +1414,12 @@ BPLONG bp_math_gcd(op1, op2)
     }
 }
 
-int b_RAND_MAX_f(rand_max)
-    BPLONG rand_max;
+int b_RAND_MAX_f(BPLONG rand_max)
 {
     return unify(rand_max, MAKEINT(RAND_MAX));
 }
 
-int b_GCD_ccf(op1, op2, gcd)
-    BPLONG op1, op2, gcd;
+int b_GCD_ccf(BPLONG op1, BPLONG op2, BPLONG gcd)
 {
     op1 = bp_math_gcd(op1, op2);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -1460,8 +1428,7 @@ int b_GCD_ccf(op1, op2, gcd)
 }
 
 /* originally in float.c */
-int equal_to(op1, op2)
-    BPLONG op1, op2;
+int equal_to(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -1505,8 +1472,7 @@ int equal_to(op1, op2)
     }
 }
 
-int greater_than(op1, op2)
-    BPLONG op1, op2;
+int greater_than(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -1548,8 +1514,7 @@ int greater_than(op1, op2)
     }
 }
 
-int greater_equal(op1, op2)
-    BPLONG op1, op2;
+int greater_equal(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -1591,8 +1556,7 @@ int greater_equal(op1, op2)
     }
 }
 
-int b_FLOAT_MINUS_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_MINUS_cf(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -1630,8 +1594,7 @@ BPLONG bp_float_log(BPLONG op1) {
     return encodefloat1(log(f));
 }
 
-int b_FLOAT_LOG_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_LOG_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_float_log(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -1663,8 +1626,7 @@ BPLONG bp_float_log2(BPLONG op1, BPLONG op2) {
     return encodefloat1(log10(f2)/log10(f1));
 }
 
-int b_FLOAT_LOG2_ccf(op1, op2, op3)
-    BPLONG op1, op2, op3;
+int b_FLOAT_LOG2_ccf(BPLONG op1, BPLONG op2, BPLONG op3)
 {
     op1 = bp_float_log2(op1, op2);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -1719,8 +1681,7 @@ BPLONG bp_pow_int_int(BPLONG base, BPLONG ex) {
 }
 
 
-BPLONG bp_math_pow(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_math_pow(BPLONG op1, BPLONG op2)
 {
     double f1, f2, res;
     BPLONG_PTR top;
@@ -1794,8 +1755,7 @@ BPLONG bp_math_pow(op1, op2)
     return encodefloat1(res);
 }
 
-int b_FLOAT_POW_ccf(op1, op2, op3)
-    BPLONG op1, op2, op3;
+int b_FLOAT_POW_ccf(BPLONG op1, BPLONG op2, BPLONG op3)
 {
     op1 = bp_math_pow(op1, op2);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -1803,8 +1763,7 @@ int b_FLOAT_POW_ccf(op1, op2, op3)
     return BP_TRUE;
 }
 
-int b_REM_ccf(op1, op2, op3)
-    BPLONG op1, op2, op3;
+int b_REM_ccf(BPLONG op1, BPLONG op2, BPLONG op3)
 {
     op1 = bp_math_rem(op1, op2);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -1832,8 +1791,7 @@ BPLONG bp_float_sqrt(BPLONG op1) {
     }
 }
 
-int b_FLOAT_SQRT_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_SQRT_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_float_sqrt(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -1842,7 +1800,6 @@ int b_FLOAT_SQRT_cf(op1, op2)
 }
 
 BPLONG bp_float_abs(BPLONG op1) {
-
     if (!ISNUM(op1)) {
         op1 = eval_arith(op1);
         if (op1 == BP_ERROR) return BP_ERROR;
@@ -1863,8 +1820,7 @@ BPLONG bp_float_abs(BPLONG op1) {
     }
 }
 
-int b_FLOAT_ABS_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_ABS_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_float_abs(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -1886,8 +1842,7 @@ BPLONG bp_float_exp(BPLONG op1) {
     return encodefloat1(exp(f));
 }
 
-int b_FLOAT_EXP_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_EXP_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_float_exp(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -1909,8 +1864,7 @@ BPLONG bp_float_sin(BPLONG op1) {
     return encodefloat1(sin(f));
 }
 
-int b_FLOAT_SIN_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_SIN_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_float_sin(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -1931,8 +1885,7 @@ BPLONG bp_float_cos(BPLONG op1) {
     return encodefloat1(cos(f));
 }
 
-int b_FLOAT_COS_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_COS_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_float_cos(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -1954,8 +1907,7 @@ BPLONG bp_float_tan(BPLONG op1) {
 }
 
 
-int b_FLOAT_TAN_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_TAN_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_float_tan(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -1977,8 +1929,7 @@ BPLONG bp_float_atan(BPLONG op1) {
     return encodefloat1(atan(f));
 }
 
-int b_FLOAT_ATAN_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_ATAN_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_float_atan(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -1986,8 +1937,7 @@ int b_FLOAT_ATAN_cf(op1, op2)
     return BP_TRUE;
 }
 
-BPLONG bp_float_atan2(op1, op2)
-    BPLONG op1, op2;
+BPLONG bp_float_atan2(BPLONG op1, BPLONG op2)
 {
     double f1, f2;
     BPLONG_PTR top;
@@ -2029,8 +1979,7 @@ BPLONG bp_float_asin(BPLONG op1) {
     return encodefloat1(asin(f));
 }
 
-int b_FLOAT_ASIN_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_ASIN_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_float_asin(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -2055,8 +2004,7 @@ BPLONG bp_float_acos(BPLONG op1) {
     return encodefloat1(acos(f));
 }
 
-int b_FLOAT_ACOS_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_ACOS_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_float_acos(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -2065,8 +2013,7 @@ int b_FLOAT_ACOS_cf(op1, op2)
 }
 
 
-int b_FLOAT_WRITE_c(op)
-    BPLONG op;
+int b_FLOAT_WRITE_c(BPLONG op)
 {
     BPLONG_PTR top;
 
@@ -2075,8 +2022,7 @@ int b_FLOAT_WRITE_c(op)
     return 1;
 }
 
-BPLONG bp_float_floor(op1)
-    BPLONG op1;
+BPLONG bp_float_floor(BPLONG op1)
 {
     if (!ISNUM(op1)) {
         op1 = eval_arith(op1);
@@ -2102,8 +2048,7 @@ BPLONG bp_float_floor(op1)
     }
 }
 
-int b_FLOAT_FLOOR_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_FLOOR_cf(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -2112,7 +2057,10 @@ int b_FLOAT_FLOOR_cf(op1, op2)
         op1 = eval_arith(op1);
         if (op1 == BP_ERROR) return BP_ERROR;
     }
-    ASSIGN_f_atom(op2, bp_float_floor(op1));
+    op1 = bp_float_floor(op1);
+    if (op1 == BP_ERROR)
+        return BP_ERROR;
+    ASSIGN_f_atom(op2, op1);
     return 1;
 }
 
@@ -2131,8 +2079,7 @@ BPLONG bp_float_float(BPLONG op1) {
     return encodefloat1(f);
 }
 
-int b_FLOAT_FLOAT_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_FLOAT_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_float_float(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -2140,8 +2087,7 @@ int b_FLOAT_FLOAT_cf(op1, op2)
     return BP_TRUE;
 }
 
-BPLONG bp_float_round(op1)
-    BPLONG op1;
+BPLONG bp_float_round(BPLONG op1)
 {
     double f;
 
@@ -2153,17 +2099,14 @@ BPLONG bp_float_round(op1)
     if (ISINT(op1) || IS_BIGINT(op1)) {
         return op1;
     } else {
-        int sign;
         f = floatval(op1);
 #ifdef M64BITS
         f = roundl(f);
 #else
         if (f < 0.0) {
             f = -f+0.5;
-            sign = -1;
         } else {
             f = f+0.5;
-            sign = 1;
         }
         TEST_NAN(f, op1);
         modf(f, &f);
@@ -2176,8 +2119,7 @@ BPLONG bp_float_round(op1)
     }
 }
 
-int b_FLOAT_ROUND_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_ROUND_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_float_round(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -2185,8 +2127,7 @@ int b_FLOAT_ROUND_cf(op1, op2)
     return BP_TRUE;
 }
 
-BPLONG bp_float_truncate(op1)
-    BPLONG op1;
+BPLONG bp_float_truncate(BPLONG op1)
 {
     double f;
     DEREF(op1);
@@ -2210,8 +2151,7 @@ BPLONG bp_float_truncate(op1)
     }
 }
 
-int b_FLOAT_TRUNCATE_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_TRUNCATE_cf(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
     DEREF(op1);
@@ -2222,8 +2162,7 @@ int b_FLOAT_TRUNCATE_cf(op1, op2)
 }
 
 
-BPLONG bp_float_ceiling(op1)
-    BPLONG op1;
+BPLONG bp_float_ceiling(BPLONG op1)
 {
     if (!ISNUM(op1)) {
         op1 = eval_arith(op1);
@@ -2248,8 +2187,7 @@ BPLONG bp_float_ceiling(op1)
     }
 }
 
-int b_FLOAT_CEILING_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_CEILING_cf(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
 
@@ -2261,8 +2199,7 @@ int b_FLOAT_CEILING_cf(op1, op2)
 }
 
 
-int b_XOR_ccf(op1, op2, op3)
-    BPLONG op1, op2, op3;
+int b_XOR_ccf(BPLONG op1, BPLONG op2, BPLONG op3)
 {
     op1 = bp_bitwise_xor(op1, op2);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -2270,8 +2207,7 @@ int b_XOR_ccf(op1, op2, op3)
     return BP_TRUE;
 }
 
-int b_FLOAT_PI_f(op1)
-    BPLONG op1;
+int b_FLOAT_PI_f(BPLONG op1)
 {
     BPLONG_PTR top;
     DEREF(op1);
@@ -2279,8 +2215,7 @@ int b_FLOAT_PI_f(op1)
     return 1;
 }
 
-int b_FLOAT_E_f(op1)
-    BPLONG op1;
+int b_FLOAT_E_f(BPLONG op1)
 {
     BPLONG_PTR top;
     DEREF(op1);
@@ -2288,8 +2223,7 @@ int b_FLOAT_E_f(op1)
     return 1;
 }
 
-int b_RANDOM_f(op1)
-    BPLONG op1;
+int b_RANDOM_f(BPLONG op1)
 {
     BPLONG_PTR top;
     DEREF(op1);
@@ -2297,8 +2231,7 @@ int b_RANDOM_f(op1)
     return 1;
 }
 
-int b_RANDOM_cf(op1, op2)
-    BPLONG op1, op2;
+int b_RANDOM_cf(BPLONG op1, BPLONG op2)
 {
     BPLONG_PTR top;
     op1 = bp_math_random1(op1);
@@ -2308,8 +2241,7 @@ int b_RANDOM_cf(op1, op2)
     return 1;
 }
 
-int b_MAX_ccf(op1, op2, op3)
-    BPLONG op1, op2, op3;
+int b_MAX_ccf(BPLONG op1, BPLONG op2, BPLONG op3)
 {
     op1 = bp_math_max(op1, op2);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -2318,8 +2250,7 @@ int b_MAX_ccf(op1, op2, op3)
 }
 
 
-int b_MIN_ccf(op1, op2, op3)
-    BPLONG op1, op2, op3;
+int b_MIN_ccf(BPLONG op1, BPLONG op2, BPLONG op3)
 {
     op1 = bp_math_min(op1, op2);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -2327,8 +2258,7 @@ int b_MIN_ccf(op1, op2, op3)
     return 1;
 }
 
-int b_MAX_cf(op1, op2)
-    BPLONG op1, op2;
+int b_MAX_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_math_max1(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -2336,8 +2266,7 @@ int b_MAX_cf(op1, op2)
     return 1;
 }
 
-int b_MIN_cf(op1, op2)
-    BPLONG op1, op2;
+int b_MIN_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_math_min1(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -2345,8 +2274,7 @@ int b_MIN_cf(op1, op2)
     return 1;
 }
 
-int b_SUM_cf(op1, op2)
-    BPLONG op1, op2;
+int b_SUM_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_math_sum1(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -2354,8 +2282,7 @@ int b_SUM_cf(op1, op2)
     return 1;
 }
 
-int b_PROD_cf(op1, op2)
-    BPLONG op1, op2;
+int b_PROD_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_math_prod1(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -2363,8 +2290,7 @@ int b_PROD_cf(op1, op2)
     return 1;
 }
 
-int b_FLOAT_FRACT_PART_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_FRACT_PART_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_math_fract_part(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -2372,8 +2298,7 @@ int b_FLOAT_FRACT_PART_cf(op1, op2)
     return 1;
 }
 
-int b_FLOAT_INT_PART_cf(op1, op2)
-    BPLONG op1, op2;
+int b_FLOAT_INT_PART_cf(BPLONG op1, BPLONG op2)
 {
     op1 = bp_math_int_part(op1);
     if (op1 == BP_ERROR) return BP_ERROR;
@@ -2381,8 +2306,7 @@ int b_FLOAT_INT_PART_cf(op1, op2)
     return 1;
 }
 
-int prettymuch_equal(op1, op2)
-    double op1, op2;
+int prettymuch_equal(double op1, double op2)
 {
     double min, diff;
 
@@ -2402,8 +2326,7 @@ int prettymuch_equal(op1, op2)
         return ((diff/min) < EPSILON) ? 1 : 0;
 }
 
-BPLONG bp_access_array(arr, indexes)
-    BPLONG arr, indexes;
+BPLONG bp_access_array(BPLONG arr, BPLONG indexes)
 {
     /*  write_term(arr);write_term(indexes); printf("\n"); */
 
@@ -2441,8 +2364,7 @@ BPLONG bp_access_array(arr, indexes)
     return BP_ERROR;
 }
 
-BPLONG bp_access_one_array(arr, index)
-    BPLONG arr, index;
+BPLONG bp_access_one_array(BPLONG arr, BPLONG index)
 {
     BPLONG_PTR arr_ptr;
     BPLONG arity;
@@ -2505,8 +2427,7 @@ error_end:
 
 
 /************************************************************/
-BPLONG eval_arith(ex)
-    BPLONG ex;
+BPLONG eval_arith(BPLONG ex)
 {
     register char *ch_ptr;
     SYM_REC_PTR ptr;
@@ -2877,8 +2798,7 @@ eval_ex:  /* ex is an exression */
 }
 
 /* evaluate an arithmetic exression */
-int b_EVAL_ARITH_cf(ex, res)
-    BPLONG ex, res;
+int b_EVAL_ARITH_cf(BPLONG ex, BPLONG res)
 {
     BPLONG res1;
 
@@ -2901,7 +2821,7 @@ int c_MUL_MOD_cccf() {
     z = ARG(3, 4); DEREF(z);
     res = ARG(4, 4);
 
-	//	printf("MUL_MOD "); write_term(x); printf(" "); write_term(y); printf(" "); write_term(z); printf("\n");
+    //  printf("MUL_MOD "); write_term(x); printf(" "); write_term(y); printf(" "); write_term(z); printf("\n");
     if (ISINT(x) && ISINT(y) && ISINT(z)) {
         x = INTVAL(x); y = INTVAL(y); z = INTVAL(z);
 
@@ -2917,25 +2837,25 @@ int c_MUL_MOD_cccf() {
             res0 = BP_ZERO;
         } else {
 #ifdef M64BITS
-		  if (BP_IN_28B_INT_RANGE(x) && BP_IN_28B_INT_RANGE(y)) {
-			res0 = MAKEINT((x*y)%z);
-		  }
+            if (BP_IN_28B_INT_RANGE(x) && BP_IN_28B_INT_RANGE(y)) {
+                res0 = MAKEINT((x*y)%z);
+            }
 #else
-          if (BP_IN_14B_INT_RANGE(x) && BP_IN_14B_INT_RANGE(x)) {
-			res0 = MAKEINT((x*y)%z);
-		  }
+            if (BP_IN_14B_INT_RANGE(x) && BP_IN_14B_INT_RANGE(x)) {
+                res0 = MAKEINT((x*y)%z);
+            }
 #endif
-		  else {
-			res0 = bp_mul_bigint_bigint(bp_int_to_bigint(x), bp_int_to_bigint(y));
-			if (ISINT(res0)){
-			  res0 = bp_int_to_bigint(INTVAL(res0));
-			}
-			res0 = bp_mod_bigint_bigint(res0, bp_int_to_bigint(z));
-		  }
+            else {
+                res0 = bp_mul_bigint_bigint(bp_int_to_bigint(x), bp_int_to_bigint(y));
+                if (ISINT(res0)){
+                    res0 = bp_int_to_bigint(INTVAL(res0));
+                }
+                res0 = bp_mod_bigint_bigint(res0, bp_int_to_bigint(z));
+            }
         }
     } else {
         if (ISINT(x)) {
-		  x = INTVAL(x); x = bp_int_to_bigint(x);
+            x = INTVAL(x); x = bp_int_to_bigint(x);
         } else if (!IS_BIGINT(x)) {
             bp_exception = integer_expected;
             return BP_ERROR;
@@ -2957,22 +2877,22 @@ int c_MUL_MOD_cccf() {
             bp_exception = integer_expected;
             return BP_ERROR;
         }
-		if (bp_compare_bigint_bigint(x, z) >= 0){
-		  x = bp_mod_bigint_bigint(x, z);
-		  if (ISINT(x)) {
-			x = bp_int_to_bigint(INTVAL(x));
-		  }
-		}
-		if (bp_compare_bigint_bigint(y, z) >= 0){
-		  y = bp_mod_bigint_bigint(y, z);
-		  if (ISINT(y)) {
-			y = bp_int_to_bigint(INTVAL(y));
-		  }
-		}
+        if (bp_compare_bigint_bigint(x, z) >= 0){
+            x = bp_mod_bigint_bigint(x, z);
+            if (ISINT(x)) {
+                x = bp_int_to_bigint(INTVAL(x));
+            }
+        }
+        if (bp_compare_bigint_bigint(y, z) >= 0){
+            y = bp_mod_bigint_bigint(y, z);
+            if (ISINT(y)) {
+                y = bp_int_to_bigint(INTVAL(y));
+            }
+        }
         res0 = bp_mul_bigint_bigint(x, y);
-		if (ISINT(res0)){
-		  res0 = bp_int_to_bigint(INTVAL(res0));
-		}
+        if (ISINT(res0)){
+            res0 = bp_int_to_bigint(INTVAL(res0));
+        }
         res0 = bp_mod_bigint_bigint(res0, z);
     }
     return unify(res, res0);

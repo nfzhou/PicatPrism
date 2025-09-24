@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : sat_bp.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
  *   Purpose: SAT interface for B-Prolog and Picat
 
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -38,9 +38,6 @@ extern int plgl_start (LGL **ptr_lgl);
 #endif
 #endif
 
-static int sat_dump_flag = 0;
-static int sat_dump_or_count_flag = 0;
-static int num_cls = 0;
 int sat_nvars;
 int sat_nvars_limit;  /* used by plglib, the size of the dynamic arrays */
 static int num_threads = 0;
@@ -96,42 +93,6 @@ int b_SAT_GET_INC_VAR_NUM_f(BPLONG Num) {
     return BP_TRUE;
 }
 
-/* initialize the global variable number, and initialize counters */
-int c_sat_start_count() {
-    BPLONG num = ARG(1, 1);
-    DEREF_NONVAR(num);
-    sat_nvars = sat_nvars_limit = (int)INTVAL(num);
-
-    sat_dump_or_count_flag = 1;
-    num_cls = 0;
-    return BP_TRUE;
-}
-
-int c_sat_stop_count() {
-    sat_dump_or_count_flag = 0;
-    unify(ARG(1, 1), MAKEINT(num_cls));
-    num_cls = 0;
-    return BP_TRUE;
-}
-
-int c_sat_start_dump() {
-    BPLONG num = ARG(1, 1);
-    DEREF_NONVAR(num);
-    sat_nvars = sat_nvars_limit = (int)INTVAL(num);
-
-    sat_dump_flag = 1;
-    sat_dump_or_count_flag = 1;
-    num_cls = 0;
-    return BP_TRUE;
-}
-
-int c_sat_stop_dump() {
-    sat_dump_flag = 0;
-    sat_dump_or_count_flag = 0;
-    print_cnf_header(sat_nvars-1, num_cls);
-    return BP_TRUE;
-}
-
 #ifdef SAT
 /* cl is a list of literals */
 int b_SAT_ADD_CL_c(BPLONG cl) {
@@ -158,29 +119,17 @@ int b_SAT_ADD_CL_c(BPLONG cl) {
         cl = FOLLOW(lst_ptr+1); DEREF_NONVAR(cl);
     }
 
-    if (sat_dump_or_count_flag == 1) {
-        num_cls++;
-        if (sat_dump_flag == 1) {
-            for (ptr = local_top; ptr != lit_ptr; ptr--) {
-                write_term(*ptr);
-                write_space();
-            }
-            write_term(BP_ZERO);
-            b_NL();
+    if (num_threads > 0) {
+        for (ptr = local_top; ptr != lit_ptr; ptr--) {
+            PSAT_ADD(INTVAL(*ptr));
         }
-    } else {
-        if (num_threads > 0) {
-            for (ptr = local_top; ptr != lit_ptr; ptr--) {
-                PSAT_ADD(INTVAL(*ptr));
-            }
-            PSAT_ADD(0);
+        PSAT_ADD(0);
+    }
+    else {
+        for (ptr = local_top; ptr != lit_ptr; ptr--) {
+            SAT_ADD(INTVAL(*ptr));
         }
-        else {
-            for (ptr = local_top; ptr != lit_ptr; ptr--) {
-                SAT_ADD(INTVAL(*ptr));
-            }
-            SAT_ADD(0);
-        }
+        SAT_ADD(0);
     }
 
     return BP_TRUE;
@@ -269,7 +218,7 @@ void Cboot_sat() {
 */
 int b_SAT_RETRIEVE_BNUM_cff(BPLONG BV, BPLONG Num, BPLONG MNum) {
 lab_start:
-  //	printf("=> BNUM %x ",BV); write_term(BV); printf("\n");
+    //  printf("=> BNUM %x ",BV); write_term(BV); printf("\n");
     DEREF_NONVAR(BV);
 
     if (ISINT(BV)) {
@@ -311,47 +260,68 @@ int c_sat_propagate_dom_bits() {
     BPLONG_PTR dv_ptr, vect_ptr;
     int i, elm, last, n;
     int mark_vect[64];  /* the number of bits can't exceed 64 */
-
+    BPLONG lb, ub;
+    
     X = ARG(1, 2);
     LogBitVect = ARG(2, 2);
 
     DEREF_NONVAR(X);
     dv_ptr = (BPLONG_PTR)UNTAGGED_TOPON_ADDR(X);
-
+    lb = DV_first(dv_ptr);
+    ub = DV_last(dv_ptr);
+    if (lb < 0){
+        lb = -lb;
+    }
+    if (ub < 0){
+        ub = -ub;
+    }
+    if (lb > ub){
+        BPLONG t = lb;
+        lb = ub;
+        ub = t;
+    }
+    if (lb == 0){
+        return BP_TRUE;
+    }
+    
     DEREF_NONVAR(LogBitVect);
     vect_ptr = (BPLONG_PTR)UNTAGGED_ADDR(LogBitVect);
     sym_ptr = (SYM_REC_PTR)FOLLOW(vect_ptr);
     n = GET_ARITY(sym_ptr);
-
     //  printf("=> c_sat_propagate_dom_bits (%d)", n); write_term(X); printf(" "); write_term(LogBitVect); printf("\n");
 
-    vect_ptr++;  /* the vector changes from 1-based to 0-based */
-    for (i = 0; i < n; i++) {
-        mark_vect[i] = 0;
-    }
+    int lb_bits[n];
+    int ub_bits[n];    
 
-    elm = DV_first(dv_ptr);
-    last = DV_last(dv_ptr);
-    for (; ; ) {
-        int val;
-
-        val = (elm >= 0) ? elm : -elm;
+    if (IS_BV_DOMAIN(dv_ptr) || (DV_first(dv_ptr) >= -15 && DV_first(dv_ptr) <= 15)){
+        vect_ptr++;  /* the vector changes from 1-based to 0-based */
         for (i = 0; i < n; i++) {
-            mark_vect[i] = (mark_vect[i] | ((val%2 == 0) ? 2 : 1));  // mark if this bit is 0 or 1
-            val >>= 1;
+            mark_vect[i] = 0;
         }
 
-        if (elm == last) break;
-        elm++;
-        if (!IS_IT_DOMAIN(dv_ptr)) elm = domain_next_bv(dv_ptr, elm);
-    }
+        elm = DV_first(dv_ptr);
+        last = DV_last(dv_ptr);
+        for (; ; ) {
+            int val;
 
-    for (i = 0; i < n; i++) {
-        int flag = mark_vect[i];
-        if (flag == 1) {  // all the domain values have 1 in ith position
-            if (!unify(*(vect_ptr+i), BP_ONE)) return BP_FALSE;
-        } else if (flag == 2) {  // all the domain values have 0 in ith position
-            if (!unify(*(vect_ptr+i), BP_ZERO)) return BP_FALSE;
+            val = (elm >= 0) ? elm : -elm;
+            for (i = 0; i < n; i++) {
+                mark_vect[i] = (mark_vect[i] | ((val%2 == 0) ? 2 : 1));  // mark if this bit is 0 or 1
+                val >>= 1;
+            }
+
+            if (elm == last) break;
+            elm++;
+            if (!IS_IT_DOMAIN(dv_ptr)) elm = domain_next_bv(dv_ptr, elm);
+        }
+
+        for (i = 0; i < n; i++) {
+            int flag = mark_vect[i];
+            if (flag == 1) {  // all the domain values have 1 in ith position
+                if (!unify(*(vect_ptr+i), BP_ONE)) return BP_FALSE;
+            } else if (flag == 2) {  // all the domain values have 0 in ith position
+                if (!unify(*(vect_ptr+i), BP_ZERO)) return BP_FALSE;
+            }
         }
     }
     //  printf("<= c_sat_propagate_dom_bits (%d)", n); write_term(X); printf(" "); write_term(LogBitVect); printf("\n");

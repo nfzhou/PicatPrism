@@ -1,6 +1,6 @@
 /********************************************************************
  *   File   : main.c
- *   Author : Neng-Fa ZHOU Copyright (C) 1994-2021
+ *   Author : Neng-Fa ZHOU Copyright (C) 1994-2025
 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,9 +11,7 @@
 int main(int argc, char *argv[]);
 static INLINE int bprolog_main(int argc, char *argv[]);
 
-int bprolog_main(argc, argv)
-    int argc;
-    char *argv[];
+int bprolog_main(int argc, char *argv[])
 {
     initialize_bprolog(argc, argv);
     if (disassem) {
@@ -33,9 +31,7 @@ int bprolog_main(argc, argv)
     }
 }
 
-int main(argc, argv)
-    int argc;
-    char *argv[];
+int main(int argc, char *argv[])
 {
     return bprolog_main(argc, argv);
 }
