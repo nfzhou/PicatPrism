@@ -1231,7 +1231,6 @@ BPLONG bp_math_sum1(BPLONG op1)
     BPLONG sum, cur_elm, op0;
     BPLONG_PTR top, ptr;
 
-
     sum = BP_ZERO;
     DEREF(op1);
     op0 = op1;
